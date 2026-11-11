@@ -1,4 +1,8 @@
-import { KeyDefinition, KeyboardLayoutType } from '../types/hardware';
+import {
+  KeyDefinition,
+  KeyboardLayoutType,
+  KeyboardSectionVisibility
+} from '../types/hardware';
 
 export const MAIN_ALPHANUMERIC_ROWS: KeyDefinition[][] = [
   [
@@ -141,31 +145,123 @@ export const NUMPAD_DEFINITIONS: KeyDefinition[] = [
   { code: 'NumpadDecimal', label: '.', sub: 'DEL' }
 ];
 
-export function getTargetKeyCodesForLayout(layout: KeyboardLayoutType): string[] {
+export const NAV_SIX_BLOCK_CODES = new Set([
+  'Insert',
+  'Home',
+  'PageUp',
+  'Delete',
+  'End',
+  'PageDown'
+]);
+
+export const SYS_TRIAD_CODES = new Set(['PrintScreen', 'ScrollLock', 'Pause']);
+
+export const EXTRA_MODIFIER_CODES = new Set(['MetaRight', 'ContextMenu']);
+
+export function getDefaultSectionsForLayout(
+  layout: KeyboardLayoutType
+): KeyboardSectionVisibility {
+  switch (layout) {
+    case 'full':
+      return {
+        fnRow: true,
+        sysTriad: true,
+        navSixBlock: true,
+        arrowCluster: true,
+        numpad: true,
+        extraModifiers: true
+      };
+    case '96':
+      return {
+        fnRow: true,
+        sysTriad: false,
+        navSixBlock: false,
+        arrowCluster: true,
+        numpad: true,
+        extraModifiers: false
+      };
+    case 'laptop':
+      return {
+        fnRow: true,
+        sysTriad: false,
+        navSixBlock: false,
+        arrowCluster: true,
+        numpad: false,
+        extraModifiers: false
+      };
+    case 'tkl':
+      return {
+        fnRow: true,
+        sysTriad: true,
+        navSixBlock: true,
+        arrowCluster: true,
+        numpad: false,
+        extraModifiers: true
+      };
+    case '75':
+      return {
+        fnRow: true,
+        sysTriad: false,
+        navSixBlock: true,
+        arrowCluster: true,
+        numpad: false,
+        extraModifiers: false
+      };
+    case '65':
+      return {
+        fnRow: false,
+        sysTriad: false,
+        navSixBlock: false,
+        arrowCluster: true,
+        numpad: false,
+        extraModifiers: false
+      };
+    case '60':
+      return {
+        fnRow: false,
+        sysTriad: false,
+        navSixBlock: false,
+        arrowCluster: false,
+        numpad: false,
+        extraModifiers: false
+      };
+  }
+}
+
+export function getTargetKeyCodes(
+  sections: KeyboardSectionVisibility,
+  excludedCodes: Set<string>
+): string[] {
   const codes: string[] = [];
 
   MAIN_ALPHANUMERIC_ROWS.forEach((row, rIdx) => {
-    if (layout === '60' && rIdx === 0) return;
+    if (!sections.fnRow && rIdx === 0) return;
     row.forEach((k) => {
-      if (k.code) codes.push(k.code);
+      if (!k.code) return;
+      if (!sections.extraModifiers && EXTRA_MODIFIER_CODES.has(k.code)) return;
+      if (!excludedCodes.has(k.code)) {
+        codes.push(k.code);
+      }
     });
   });
 
-  if (layout === 'full' || layout === 'tkl' || layout === '75') {
-    NAVIGATION_CLUSTER_ROWS.forEach((row) => {
-      row.forEach((k) => {
-        if (!k.code) return;
-        if (layout === '75' && (k.code === 'ScrollLock' || k.code === 'Pause' || k.code === 'Insert')) {
-          return;
-        }
+  NAVIGATION_CLUSTER_ROWS.forEach((row) => {
+    row.forEach((k) => {
+      if (!k.code) return;
+      if (SYS_TRIAD_CODES.has(k.code) && !sections.sysTriad) return;
+      if (NAV_SIX_BLOCK_CODES.has(k.code) && !sections.navSixBlock) return;
+      if (k.code.startsWith('Arrow') && !sections.arrowCluster) return;
+      if (!excludedCodes.has(k.code)) {
         codes.push(k.code);
-      });
+      }
     });
-  }
+  });
 
-  if (layout === 'full') {
+  if (sections.numpad) {
     NUMPAD_DEFINITIONS.forEach((k) => {
-      if (k.code) codes.push(k.code);
+      if (k.code && !excludedCodes.has(k.code)) {
+        codes.push(k.code);
+      }
     });
   }
 
