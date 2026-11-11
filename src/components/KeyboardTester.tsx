@@ -6,7 +6,8 @@ import {
   ShieldCheck,
   ShieldAlert,
   RotateCcw,
-  FastForward
+  FastForward,
+  Maximize2
 } from 'lucide-react';
 import {
   MAIN_ALPHANUMERIC_ROWS,
@@ -37,6 +38,7 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
   onPass
 }) => {
   const [layout, setLayout] = useState<KeyboardLayoutType>('full');
+  const [unitSize, setUnitSize] = useState<number>(58);
   const [testedCodes, setTestedCodes] = useState<Set<string>>(new Set());
   const [pressedCodes, setPressedCodes] = useState<Set<string>>(new Set());
   const [pressCounts, setPressCounts] = useState<Record<string, number>>({});
@@ -158,7 +160,6 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
     };
   }, [isActive, handleKeyPress, handleKeyRelease]);
 
-  // Check for 100% completion
   useEffect(() => {
     const total = targetCodes.size;
     if (total > 0 && testedCodes.size === total && !hasTriggeredPassRef.current) {
@@ -215,7 +216,7 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
         }}
       >
         {count > 0 && <span className="key-count-badge">{count}</span>}
-        <span>{k.label}</span>
+        <span className="key-main-label">{k.label}</span>
         {k.sub && <span className="key-sub">{k.sub}</span>}
       </div>
     );
@@ -304,7 +305,7 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
 
       <div className="toolbar-row">
         <div className="toolbar-group">
-          <label className="toolbar-label">Form Factor / Layout:</label>
+          <label className="toolbar-label">Form Factor:</label>
           <select
             className="btn select-input"
             value={layout}
@@ -314,6 +315,21 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
             <option value="tkl">80% Tenkeyless — TKL (87 Keys)</option>
             <option value="75">75% Compact / Notebook (84 Keys)</option>
             <option value="60">60% Compact Mechanical (61 Keys)</option>
+          </select>
+
+          <label className="toolbar-label" style={{ marginLeft: '0.35rem' }}>
+            <Maximize2 size={13} style={{ marginRight: '4px', verticalAlign: 'middle' }} />
+            Key Scale:
+          </label>
+          <select
+            className="btn select-input"
+            value={unitSize}
+            onChange={(e) => setUnitSize(Number(e.target.value))}
+          >
+            <option value={62}>Extra Large (62px Full Deck)</option>
+            <option value={58}>Large Full-Width (58px Default)</option>
+            <option value={52}>Medium (52px)</option>
+            <option value={46}>Compact (46px)</option>
           </select>
 
           <button className="btn" onClick={resetKeyboardState}>
@@ -355,7 +371,10 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
       </div>
 
       <div className="keyboard-scroll-wrapper">
-        <div className="keyboard-chassis">
+        <div
+          className="keyboard-chassis"
+          style={{ '--u': `${unitSize}px` } as React.CSSProperties}
+        >
           {/* Main Alphanumeric Block */}
           <div className="kb-section">
             {MAIN_ALPHANUMERIC_ROWS.map((row, rIdx) => {
@@ -396,7 +415,7 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
           {/* Numpad Block */}
           {layout === 'full' && (
             <div className="kb-section">
-              <div className="kb-row fn-row" style={{ height: '46px' }} />
+              <div className="kb-row fn-row numpad-top-spacer" />
               <div className="numpad-grid">
                 {NUMPAD_DEFINITIONS.map((k, kIdx) => renderKey(k, kIdx))}
               </div>
