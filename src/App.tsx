@@ -2,7 +2,8 @@ import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   ModuleTab,
   BatchRecord,
-  PassNotification
+  PassNotification,
+  ThemeMode
 } from './types/hardware';
 import { soundEngine } from './utils/soundEngine';
 import { Header } from './components/Header';
@@ -17,6 +18,7 @@ import { BatchHistoryTable } from './components/BatchHistoryTable';
 
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ModuleTab>('keyboard');
+  const [theme, setTheme] = useState<ThemeMode>('dark');
   const [resetDurationSec, setResetDurationSec] = useState<number>(600); // Default 10 minutes
   const [remainingSec, setRemainingSec] = useState<number>(600);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
@@ -26,6 +28,10 @@ export const App: React.FC = () => {
   const [batchHistory, setBatchHistory] = useState<BatchRecord[]>([]);
 
   const escTimesRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    document.documentElement.setAttribute('data-theme', theme);
+  }, [theme]);
 
   const triggerInstantReset = useCallback(() => {
     setPassNotification(null);
@@ -115,6 +121,10 @@ export const App: React.FC = () => {
     setSoundEnabled(next);
   };
 
+  const handleToggleTheme = () => {
+    setTheme((prev) => (prev === 'dark' ? 'light' : 'dark'));
+  };
+
   const handleSelectTab = (tab: ModuleTab) => {
     setActiveTab(tab);
     setPassNotification(null);
@@ -127,8 +137,10 @@ export const App: React.FC = () => {
         resetDurationSec={resetDurationSec}
         remainingSec={remainingSec}
         soundEnabled={soundEnabled}
+        theme={theme}
         onDurationChange={handleDurationChange}
         onToggleSound={handleToggleSound}
+        onToggleTheme={handleToggleTheme}
         onInstantReset={triggerInstantReset}
       />
 
