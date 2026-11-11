@@ -6,7 +6,11 @@ export type ModuleTab =
   | 'gamepad'
   | 'history';
 
+export type ThemeMode = 'dark' | 'light';
+
 export type KeyboardLayoutType = 'full' | 'tkl' | '75' | '60';
+
+export type KeySizeMode = 'large' | 'compact';
 
 export interface KeyDefinition {
   code: string;
