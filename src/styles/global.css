@@ -626,6 +626,37 @@ body {
   color: var(--key-chatter-text);
 }
 
+.key.excluded {
+  opacity: 0.24;
+  border-style: dashed;
+  border-bottom-width: 1px;
+  text-decoration: line-through;
+}
+
+.section-filter-bar {
+  padding: 0.55rem 1rem;
+  background: var(--bg-secondary);
+}
+
+.btn-chip {
+  padding: 0.3rem 0.65rem;
+  font-size: 0.74rem;
+  font-family: var(--font-mono);
+  border-radius: 5px;
+}
+
+.btn-chip.chip-on {
+  background: rgba(16, 185, 129, 0.14);
+  border-color: rgba(16, 185, 129, 0.45);
+  color: var(--accent-green);
+}
+
+.btn-chip.chip-off {
+  background: var(--bg-card);
+  border-color: var(--border-color);
+  color: var(--text-muted);
+}
+
 .key-count-badge {
   position: absolute;
   top: 3px;
