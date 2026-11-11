@@ -1,0 +1,13 @@
+/* Keyframe Animations & Diagnostic Glow Effects */
+@keyframes pulseGlowGreen {
+  0%, 100% {
+    box-shadow: 0 0 12px rgba(16, 185, 129, 0.35);
+  }
+  50% {
+    box-shadow: 0 0 24px rgba(16, 185, 129, 0.7);
+  }
+}
+
+.pass-stamp {
+  animation: pulseGlowGreen 2s infinite ease-in-out;
+}
