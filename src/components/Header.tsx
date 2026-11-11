@@ -5,8 +5,11 @@ import {
   Clock,
   Volume2,
   VolumeX,
-  RotateCcw
+  RotateCcw,
+  Sun,
+  Moon
 } from 'lucide-react';
+import { ThemeMode } from '../types/hardware';
 import { formatCountdownTime } from '../utils/formatters';
 
 interface HeaderProps {
@@ -14,8 +17,10 @@ interface HeaderProps {
   resetDurationSec: number;
   remainingSec: number;
   soundEnabled: boolean;
+  theme: ThemeMode;
   onDurationChange: (seconds: number) => void;
   onToggleSound: () => void;
+  onToggleTheme: () => void;
   onInstantReset: () => void;
 }
 
@@ -24,8 +29,10 @@ export const Header: React.FC<HeaderProps> = ({
   resetDurationSec,
   remainingSec,
   soundEnabled,
+  theme,
   onDurationChange,
   onToggleSound,
+  onToggleTheme,
   onInstantReset
 }) => {
   return (
@@ -63,6 +70,15 @@ export const Header: React.FC<HeaderProps> = ({
           </select>
           <span className="inactivity-pill">{formatCountdownTime(remainingSec)}</span>
         </div>
+
+        <button
+          className="btn"
+          onClick={onToggleTheme}
+          title="Switch between Dark Grey and Light appearance"
+        >
+          {theme === 'dark' ? <Sun size={16} /> : <Moon size={16} />}
+          <span>{theme === 'dark' ? 'Light Mode' : 'Dark Grey'}</span>
+        </button>
 
         <button className="btn" onClick={onToggleSound} title="Toggle audio feedback">
           {soundEnabled ? <Volume2 size={16} /> : <VolumeX size={16} />}
