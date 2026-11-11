@@ -8,7 +8,14 @@ export type ModuleTab =
 
 export type ThemeMode = 'dark' | 'light';
 
-export type KeyboardLayoutType = 'full' | 'tkl' | '75' | '60';
+export type KeyboardLayoutType =
+  | 'full'
+  | '96'
+  | 'laptop'
+  | 'tkl'
+  | '75'
+  | '65'
+  | '60';
 
 export type KeySizeMode = 'large' | 'compact';
 
@@ -20,6 +27,15 @@ export interface KeyDefinition {
   extraClass?: string;
   gap?: string;
   empty?: boolean;
+}
+
+export interface KeyboardSectionVisibility {
+  fnRow: boolean;
+  sysTriad: boolean; // PRTSC, SCRLK, PAUSE
+  navSixBlock: boolean; // INS, HOME, PGUP, DEL, END, PGDN
+  arrowCluster: boolean;
+  numpad: boolean;
+  extraModifiers: boolean; // MetaRight, ContextMenu
 }
 
 export interface BatchRecord {
