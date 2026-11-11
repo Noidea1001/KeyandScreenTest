@@ -1,23 +1,41 @@
-# 🛠️ All-in-One Hardware Diagnostic & Tester (KeyandScreenTest)
+# Hardware Diagnostic Suite (React + TypeScript)
 
-ប្រព័ន្ធតេស្តឧបករណ៍កុំព្យូទ័រ **All-in-One Hardware Tester** សម្រាប់ត្រួតពិនិត្យ **Keyboard, Mouse, Screen/Monitor, Speaker, Microphone, Webcam និង Gamepad** នៅក្នុងវេបសាយតែមួយ។
+Professional all-in-one hardware diagnostic and peripheral verification application built with **React 18**, **TypeScript**, and **Vite**. Designed for technicians, QC stations, and batch testing workflows.
 
-## ✨ មុខងារសំខាន់ៗ (Key Features)
+## Core Modules
 
-- **⌨️ Keyboard Tester**:
-  - គាំទ្រ Layout ច្រើនប្រភេទ៖ **100% Full-size (104 Keys)**, **80% TKL (87 Keys)**, **75% Compact (84 Keys)**, និង **60% Mini (61 Keys)**។
-  - ឆែករកបញ្ហា **Key Chatter (គ្រាប់ចុចលោតត្រួតគ្នា)** និងវាស់ **NKRO (N-Key Rollover / Anti-Ghosting)**។
-- **🖱️ Mouse Tester**:
-  - តេស្តប៊ូតុងទាំង ៥ (Left, Right, Middle, Side B4, Side B5) និងកង់រមូរ (Scroll Up / Down)។
-  - ឆែករកបញ្ហា **Double-Click Fault**, វាស់ល្បឿន **Polling Rate (Hz)** និងផ្ទាំងគូសតេស្ត **Drag & Drop Sensor**។
-- **🖥️ Screen & Monitor Diagnostics**:
-  - តេស្តពេញអេក្រង់ (**Dead / Stuck Pixel Test** ៨ ពណ៌)។
-  - តេស្ត **Backlight Bleed & Grey Uniformity**, **Color Gradient** និង **Refresh Rate (FPS/Hz) Motion Blur**។
-- **🔊 Audio, Mic, Webcam & 🎮 Gamepad**:
-  - តេស្តសំឡេង Speaker ឆ្វេង/ស្តាំ/Stereo/Bass Sweep, មីក្រូហ្វូន (Audio Waveform), កាមេរ៉ា និងដៃហ្គេម។
-- **✅ Auto-PASS & 10-Minute Auto-Reset System**:
-  - លោតផ្ទាំង **PASS ✅** ដោយស្វ័យប្រវត្តិនៅពេលតេស្តដើរគ្រប់ 100%។
-  - កំណត់ត្រាចូលក្នុង **Batch Testing Log** និងរាប់ថយក្រោយ **Auto-Reset (លំនាំដើម 10 នាទី ឬអាចប្តូរទៅ 5s, 10s, 30s, 1m, 5m)** ដើម្បីត្រៀមតេស្តឧបករណ៍បន្ទាប់។
+- **Keyboard Diagnostic**:
+  - Supports 100% Full-Size ANSI (104 keys), 80% TKL (87 keys), 75% Compact (84 keys), and 60% Compact (61 keys).
+  - Real-time N-Key Rollover (NKRO) and anti-ghosting counter.
+  - Switch bounce / chatter detection (< 28ms interval).
+- **Mouse & Sensor Diagnostic**:
+  - 5-button actuation counter (Left, Right, Middle, Side B4, Side B5) and scroll wheel encoder verification.
+  - Microswitch double-click fault detector (< 42ms interval).
+  - Live Polling Rate (Hz) meter and continuous hold-drag sensor surface.
+- **Display & Monitor Diagnostic**:
+  - Full-screen 8-color dead/stuck subpixel inspection.
+  - Backlight bleed (0% black) and grey uniformity (5%, 15%, 50%) patterns.
+  - RGB/Luminance gradient ramp and subpixel alignment grid.
+  - Real-time VSync refresh rate (Hz/FPS) and motion response test.
+- **Audio, Microphone & Camera Diagnostic**:
+  - Left, Right, Center Stereo, and Frequency Sweep synthesis via Web Audio API.
+  - Real-time Microphone FFT spectrum analyzer and input level meter.
+  - Webcam video stream and native resolution inspector.
+- **Controller & Axis Diagnostic**:
+  - Gamepad API digital trigger verification and analog stick drift readout.
+- **Auto-PASS & 10-Minute Auto-Reset Engine**:
+  - Automatically displays a prominent **PASS** banner when 100% of module checks complete.
+  - Logs verified units into the session Batch Log (with CSV export) and starts a configurable auto-reset countdown (default **10 minutes**).
 
-## 🚀 របៀបប្រើប្រាស់ (How to Run)
-បើកឯកសារ `index.html` ដោយផ្ទាល់នៅលើ Browser (Chrome, Edge, Firefox, Brave) ដើម្បីចាប់ផ្តើមប្រើប្រាស់ភ្លាមៗ។
+## Getting Started
+
+```bash
+npm install
+npm run dev
+```
+
+Build for production:
+
+```bash
+npm run build
+```
