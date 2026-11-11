@@ -1,33 +1,21 @@
-# 📖 មគ្គុទ្ទេសក៍ប្រើប្រាស់ (User Guide) — All-in-One Hardware Tester
+# User Guide — Hardware Diagnostic Suite
 
-ឯកសារណែនាំសម្រាប់ការប្រើប្រាស់ប្រព័ន្ធតេស្តឧបករណ៍កុំព្យូទ័រ (Keyboard, Mouse, Screen, Audio, Mic, Webcam & Gamepad)។
+## 1. Batch Keyboard Verification
+1. Select the keyboard form factor (**100% Full-Size**, **80% TKL**, **75% Compact**, or **60% Compact**).
+2. Press every key across the keyboard:
+   - Verified keys highlight in green.
+   - Keys exhibiting switch bounce (< 28ms between actuations) highlight in amber.
+3. Upon reaching 100% key verification:
+   - The **PASS** banner is displayed automatically and the session counter increments.
+   - The **Auto-Reset Timer** (default 10 minutes, configurable from 5 seconds to 10 minutes) begins counting down to reset the board for the next unit.
+   - Click **Reset Now** or press `ESC` three times to reset immediately.
 
----
+## 2. Mouse & Sensor Verification
+1. Open the **Mouse & Sensor** module.
+2. Actuate Left Click, Right Click, Middle Click, and scroll both Up and Down.
+3. Move and drag across the tracking canvas to measure Polling Rate (Hz) and verify hold-drag continuity.
 
-## ១. របៀបតេស្តក្តារចុចច្រើនគ្រឿងបន្តបន្ទាប់គ្នា (Batch Keyboard Testing)
-1. ជ្រើសរើស **ទម្រង់ក្តារចុច (Layout)** ឱ្យត្រូវនឹងក្តារចុចជាក់ស្តែង៖
-   - **100% Full-Size (104 Keys)**: សម្រាប់ក្តារចុចធំមានផ្នែកលេខ Numpad។
-   - **80% TKL (87 Keys)**: សម្រាប់ក្តារចុចមិនមាន Numpad។
-   - **75% Compact (84 Keys)** ឬ **60% Mini (61 Keys)**: សម្រាប់ក្តារចុចតូច ឬក្តារចុច Laptop។
-2. ចុចគ្រាប់ចុចទាំងអស់ពីឆ្វេងទៅស្តាំ៖
-   - គ្រាប់ចុចដែលដើរធម្មតានឹងប្តូរទៅជា **ពណ៌បៃតង**។
-   - ប្រសិនបើគ្រាប់ចុចណាមួយមានបញ្ហាលោត ២ ដងក្នុងពេលតែមួយ (Key Chatter < 28ms) វានឹងលោត **ពណ៌ទឹកក្រូច**។
-3. នៅពេលចុចគ្រប់ 100% នៃគ្រាប់ចុចទាំងអស់៖
-   - ផ្ទាំង **PASS ✅** នឹងលោតឡើងព្រមជាមួយសំឡេងបញ្ជាក់។
-   - ចំនួន **តេស្តជាប់សរុប (PASS)** នឹងកើនឡើង +1 ដោយស្វ័យប្រវត្តិ។
-   - ម៉ោងរាប់ថយក្រោយ **Auto-Reset (10 នាទី)** នឹងចាប់ផ្តើមរាប់ ឬបងអាចចុចប៊ូតុង **«⚡ Reset ឥឡូវនេះ»** (ឬចុច `Esc` 3 ដង) ដើម្បីដូរក្តារចុចថ្មីតេស្តបន្តភ្លាមៗ។
-
----
-
-## ២. របៀបតេស្តម៉ៅ (Mouse Diagnostic)
-1. ចូលទៅកាន់ផ្ទាំង **🖱️ តេស្ត Mouse**។
-2. ចុចប៊ូតុង **Left Click**, **Right Click**, **Middle (Scroll Click)** និងរមូរកង់ **Scroll Up / Scroll Down**។
-3. នៅពេលគ្រប់ទាំង 5 មុខងារ និងគ្មានបញ្ហា Double-Click Fault ផ្ទាំង **PASS ✅** នឹងលោតឡើងភ្លាមៗ។
-4. អាចគូសនៅលើផ្ទាំងខ្មៅដើម្បីវាស់ល្បឿន **Polling Rate (Hz)** និងតេស្តការអូស (**Drag Test**)។
-
----
-
-## ៣. របៀបតេស្តអេក្រង់ (Screen / Monitor Test)
-1. ចូលទៅកាន់ផ្ទាំង **🖥️ តេស្ត Screen / Monitor**។
-2. ចុចបើកផ្ទាំងពេញអេក្រង់ (Fullscreen) ដើម្បីពិនិត្យមើល **Dead Pixel**, **Backlight Bleed**, **Gradient** និង **Motion Blur**។
-3. ចុចប៊ូតុងបញ្ជាក់ទាំង 4 ជំហានដើម្បីទទួលបានលទ្ធផល **PASS ✅**។
+## 3. Display & Monitor Verification
+1. Open the **Display & Monitor** module.
+2. Launch fullscreen patterns for Dead Pixel, Backlight Uniformity, and Color Gradient checks.
+3. Confirm each of the 4 inspection steps to record a **PASS** result.
