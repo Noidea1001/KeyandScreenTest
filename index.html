@@ -4,7 +4,21 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Hardware Diagnostic Suite — All-in-One System & Peripheral Tester</title>
-  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="icon" type="image/svg+xml" href="./favicon.svg" />
+  <script>
+    (function () {
+      try {
+        var savedTheme = localStorage.getItem('hw_theme');
+        var theme = savedTheme === 'light' || savedTheme === 'dark' ? savedTheme : 'dark';
+        document.documentElement.setAttribute('data-theme', theme);
+        document.documentElement.style.backgroundColor = theme === 'light' ? '#f1f2f4' : '#141416';
+      } catch (e) {}
+    })();
+  </script>
+  <style>
+    html[data-theme='dark'], html[data-theme='dark'] body { background-color: #141416; color: #f4f4f6; }
+    html[data-theme='light'], html[data-theme='light'] body { background-color: #f1f2f4; color: #18181b; }
+  </style>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet" />
