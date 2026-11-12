@@ -1,0 +1,16 @@
+{
+  "name": "Hardware Diagnostic Suite",
+  "short_name": "HW Diagnostic",
+  "description": "Professional All-in-One Keyboard, Mouse, Display, Audio, Camera, and Controller Verification Suite.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#141416",
+  "theme_color": "#141416",
+  "icons": [
+    {
+      "src": "./favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ]
+}
