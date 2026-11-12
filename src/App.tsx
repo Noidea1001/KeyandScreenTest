@@ -16,11 +16,42 @@ import { AudioMediaTester } from './components/AudioMediaTester';
 import { GamepadTester } from './components/GamepadTester';
 import { BatchHistoryTable } from './components/BatchHistoryTable';
 
+const VALID_TABS: ModuleTab[] = [
+  'keyboard',
+  'mouse',
+  'screen',
+  'media',
+  'gamepad',
+  'history'
+];
+
+function getInitialTab(): ModuleTab {
+  const hash = window.location.hash.replace('#', '') as ModuleTab;
+  if (VALID_TABS.includes(hash)) {
+    return hash;
+  }
+  const saved = localStorage.getItem('hw_active_tab') as ModuleTab | null;
+  if (saved && VALID_TABS.includes(saved)) {
+    return saved;
+  }
+  return 'keyboard';
+}
+
+function getInitialTheme(): ThemeMode {
+  const saved = localStorage.getItem('hw_theme') as ThemeMode | null;
+  return saved === 'light' || saved === 'dark' ? saved : 'dark';
+}
+
+function getInitialResetDuration(): number {
+  const saved = Number(localStorage.getItem('hw_reset_duration'));
+  return saved > 0 ? saved : 600;
+}
+
 export const App: React.FC = () => {
-  const [activeTab, setActiveTab] = useState<ModuleTab>('keyboard');
-  const [theme, setTheme] = useState<ThemeMode>('dark');
-  const [resetDurationSec, setResetDurationSec] = useState<number>(600); // Default 10 minutes
-  const [remainingSec, setRemainingSec] = useState<number>(600);
+  const [activeTab, setActiveTab] = useState<ModuleTab>(getInitialTab);
+  const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
+  const [resetDurationSec, setResetDurationSec] = useState<number>(getInitialResetDuration);
+  const [remainingSec, setRemainingSec] = useState<number>(getInitialResetDuration);
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [resetSignal, setResetSignal] = useState<number>(0);
   const [passNotification, setPassNotification] = useState<PassNotification | null>(null);
@@ -31,7 +62,13 @@ export const App: React.FC = () => {
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('hw_theme', theme);
   }, [theme]);
+
+  useEffect(() => {
+    localStorage.setItem('hw_active_tab', activeTab);
+    window.history.replaceState(null, '', `#${activeTab}`);
+  }, [activeTab]);
 
   const triggerInstantReset = useCallback(() => {
     setPassNotification(null);
@@ -113,6 +150,7 @@ export const App: React.FC = () => {
   const handleDurationChange = (seconds: number) => {
     setResetDurationSec(seconds);
     setRemainingSec(seconds);
+    localStorage.setItem('hw_reset_duration', String(seconds));
   };
 
   const handleToggleSound = () => {
