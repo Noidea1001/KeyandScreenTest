@@ -195,6 +195,9 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
     if (!isActive) return;
 
     const onKeyDown = (e: KeyboardEvent) => {
+      if ((e.ctrlKey || e.metaKey) && (e.code === 'KeyR' || e.code === 'F5')) {
+        return;
+      }
       e.preventDefault();
       const matchedCodes = resolveMatchedKeyCodes(e);
       const displayLabel = e.key === ' ' ? 'SPACE' : e.key.toUpperCase();
