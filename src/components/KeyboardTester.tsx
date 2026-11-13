@@ -74,9 +74,11 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
     label: 'None',
     code: '—'
   });
+  const [lastHoldMs, setLastHoldMs] = useState<number | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
 
   const lastPressTimeRef = React.useRef<Record<string, number>>({});
+  const keyDownTimeRef = React.useRef<Record<string, number>>({});
   const hasTriggeredPassRef = React.useRef<boolean>(false);
 
   const targetCodes = useMemo(
@@ -92,8 +94,10 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
     setChatterDetail('No switch bounce detected');
     setMaxRollover(0);
     setLastKeyInfo({ label: 'None', code: '—' });
+    setLastHoldMs(null);
     setHistory([]);
     lastPressTimeRef.current = {};
+    keyDownTimeRef.current = {};
     hasTriggeredPassRef.current = false;
   }, []);
 
@@ -153,6 +157,7 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
 
       if (!isRepeat) {
         const now = performance.now();
+        keyDownTimeRef.current[primaryCode] = now;
         const prevTime = lastPressTimeRef.current[primaryCode];
         let detectedChatter = false;
 
@@ -195,6 +200,14 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
   );
 
   const handleKeyReleaseBatch = useCallback((codes: string[]) => {
+    const primaryCode = codes[0];
+    if (primaryCode && keyDownTimeRef.current[primaryCode] !== undefined) {
+      const heldMs = Math.round(
+        performance.now() - keyDownTimeRef.current[primaryCode]
+      );
+      delete keyDownTimeRef.current[primaryCode];
+      setLastHoldMs(heldMs);
+    }
     setPressedCodes((prev) => {
       const next = new Set(prev);
       codes.forEach((c) => next.delete(c));
@@ -351,7 +364,13 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
             {pressedCodes.size}{' '}
             <span className="stat-inline-muted">(Peak: {maxRollover})</span>
           </div>
-          <div className="stat-sub">Anti-ghosting & rollover check</div>
+          <div className="stat-sub">
+            {pressedCodes.size > 0
+              ? `Chord: ${Array.from(pressedCodes).slice(0, 4).join(' + ')}${
+                  pressedCodes.size > 4 ? '…' : ''
+                }`
+              : 'Anti-ghosting & rollover check'}
+          </div>
         </div>
 
         <div className="stat-card">
@@ -360,7 +379,10 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
             <Terminal size={15} />
           </div>
           <div className="stat-value">{lastKeyInfo.label}</div>
-          <div className="stat-sub">Code: {lastKeyInfo.code}</div>
+          <div className="stat-sub">
+            Code: {lastKeyInfo.code}
+            {lastHoldMs !== null ? ` · Hold: ${lastHoldMs} ms` : ''}
+          </div>
         </div>
 
         <div className="stat-card">
