@@ -1147,3 +1147,115 @@ body {
 .text-blue {
   color: var(--accent-blue);
 }
+
+/* Touch & Stylus Grid */
+.touch-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 0.55rem;
+  margin-top: 1rem;
+  touch-action: none;
+  user-select: none;
+}
+
+.touch-cell {
+  height: 76px;
+  border-radius: 8px;
+  background: var(--key-bg);
+  border: 1px solid var(--key-border);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--text-muted);
+  transition: background 0.12s ease, border-color 0.12s ease, color 0.12s ease;
+}
+
+.touch-cell.tested {
+  background: var(--key-tested-bg);
+  border-color: var(--accent-green);
+  color: var(--key-tested-text);
+}
+
+/* System & Battery Telemetry */
+.system-info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.system-info-card {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.system-kv-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.55rem;
+  margin-top: 0.75rem;
+}
+
+.system-kv-list > div {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 0.75rem;
+  border-bottom: 1px solid var(--border-color);
+  padding-bottom: 0.35rem;
+}
+
+.system-kv-list dt {
+  font-size: 0.78rem;
+  color: var(--text-secondary);
+}
+
+.system-kv-list dd {
+  font-family: var(--font-mono);
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-align: right;
+  word-break: break-word;
+}
+
+/* Printable QA Certificate */
+.print-certificate-header {
+  display: none;
+}
+
+@media print {
+  body {
+    background: #ffffff !important;
+    color: #111827 !important;
+  }
+
+  .top-header,
+  .nav-tabs,
+  .pass-banner,
+  .card-actions {
+    display: none !important;
+  }
+
+  .print-certificate-header {
+    display: block;
+    margin-bottom: 1.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 2px solid #111827;
+  }
+
+  .print-certificate-header h2 {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+  }
+
+  .batch-table th,
+  .batch-table td {
+    color: #111827 !important;
+    border-bottom: 1px solid #d1d5db !important;
+  }
+}
