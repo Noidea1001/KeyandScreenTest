@@ -1,5 +1,5 @@
 import React from 'react';
-import { Download, FileJson, Trash2, CheckCircle2 } from 'lucide-react';
+import { Download, FileJson, Printer, Trash2, CheckCircle2 } from 'lucide-react';
 import { BatchRecord } from '../types/hardware';
 import {
   exportBatchHistoryCSV,
@@ -17,6 +17,12 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
 }) => {
   return (
     <section className="module-panel active">
+      <div className="print-certificate-header">
+        <h2>Hardware Diagnostic Suite — QA Verification Certificate</h2>
+        <p>
+          Generated: {new Date().toLocaleString()} · Verified Modules: {records.length}
+        </p>
+      </div>
       <div className="batch-log-container">
         <div className="batch-log-header">
           <div>
@@ -41,6 +47,14 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
             >
               <FileJson size={15} />
               <span>Export JSON Report</span>
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => window.print()}
+              disabled={records.length === 0}
+            >
+              <Printer size={15} />
+              <span>Print / PDF Certificate</span>
             </button>
             <button
               className="btn btn-danger"
