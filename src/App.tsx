@@ -14,6 +14,8 @@ import { MouseTester } from './components/MouseTester';
 import { ScreenTester } from './components/ScreenTester';
 import { AudioMediaTester } from './components/AudioMediaTester';
 import { GamepadTester } from './components/GamepadTester';
+import { TouchTester } from './components/TouchTester';
+import { SystemInfoTester } from './components/SystemInfoTester';
 import { BatchHistoryTable } from './components/BatchHistoryTable';
 
 const VALID_TABS: ModuleTab[] = [
@@ -22,6 +24,8 @@ const VALID_TABS: ModuleTab[] = [
   'screen',
   'media',
   'gamepad',
+  'touch',
+  'system',
   'history'
 ];
 
@@ -234,6 +238,21 @@ export const App: React.FC = () => {
         {activeTab === 'gamepad' && (
           <GamepadTester
             isActive={activeTab === 'gamepad'}
+            onPass={handleModulePass}
+          />
+        )}
+
+        {activeTab === 'touch' && (
+          <TouchTester
+            resetSignal={resetSignal}
+            onActivity={handleUserActivity}
+            onPass={handleModulePass}
+          />
+        )}
+
+        {activeTab === 'system' && (
+          <SystemInfoTester
+            onActivity={handleUserActivity}
             onPass={handleModulePass}
           />
         )}
