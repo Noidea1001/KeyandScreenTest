@@ -21,10 +21,15 @@ describe('report exports', () => {
     vi.restoreAllMocks();
   });
 
-  it('builds structured JSON report payload', () => {
-    const json = buildBatchHistoryJSON(SAMPLE_RECORDS);
+  it('builds structured JSON report payload with optional metadata', () => {
+    const json = buildBatchHistoryJSON(SAMPLE_RECORDS, {
+      technician: 'Alex',
+      assetTag: 'SN-100'
+    });
     const parsed = JSON.parse(json);
     expect(parsed.totalRecords).toBe(1);
+    expect(parsed.technician).toBe('Alex');
+    expect(parsed.assetTag).toBe('SN-100');
     expect(parsed.records).toEqual(SAMPLE_RECORDS);
     expect(typeof parsed.exportedAt).toBe('string');
   });
