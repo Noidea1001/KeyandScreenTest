@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
 import {
   ModuleTab,
+  BatchMetadata,
   BatchRecord,
   PassNotification,
   ThemeMode
@@ -8,6 +9,7 @@ import {
 import { soundEngine } from './utils/soundEngine';
 import { Header } from './components/Header';
 import { Navigation } from './components/Navigation';
+import { QAChecklistBar } from './components/QAChecklistBar';
 import { PassBanner } from './components/PassBanner';
 import { KeyboardTester } from './components/KeyboardTester';
 import { MouseTester } from './components/MouseTester';
@@ -51,6 +53,31 @@ function getInitialResetDuration(): number {
   return saved > 0 ? saved : 600;
 }
 
+function getInitialBatchHistory(): BatchRecord[] {
+  try {
+    const raw = localStorage.getItem('hw_batch_history');
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? (parsed as BatchRecord[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function getInitialBatchMetadata(): BatchMetadata {
+  try {
+    const raw = localStorage.getItem('hw_batch_metadata');
+    if (!raw) return { technician: '', assetTag: '' };
+    const parsed = JSON.parse(raw) as Partial<BatchMetadata>;
+    return {
+      technician: typeof parsed.technician === 'string' ? parsed.technician : '',
+      assetTag: typeof parsed.assetTag === 'string' ? parsed.assetTag : ''
+    };
+  } catch {
+    return { technician: '', assetTag: '' };
+  }
+}
+
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ModuleTab>(getInitialTab);
   const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
@@ -60,9 +87,18 @@ export const App: React.FC = () => {
   const [resetSignal, setResetSignal] = useState<number>(0);
   const [passNotification, setPassNotification] = useState<PassNotification | null>(null);
   const [passedModules, setPassedModules] = useState<Set<ModuleTab>>(new Set());
-  const [batchHistory, setBatchHistory] = useState<BatchRecord[]>([]);
+  const [batchHistory, setBatchHistory] = useState<BatchRecord[]>(getInitialBatchHistory);
+  const [batchMetadata, setBatchMetadata] = useState<BatchMetadata>(getInitialBatchMetadata);
 
   const escTimesRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    localStorage.setItem('hw_batch_history', JSON.stringify(batchHistory));
+  }, [batchHistory]);
+
+  useEffect(() => {
+    localStorage.setItem('hw_batch_metadata', JSON.stringify(batchMetadata));
+  }, [batchMetadata]);
 
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', theme);
@@ -194,6 +230,12 @@ export const App: React.FC = () => {
       />
 
       <main className="main-container">
+        <QAChecklistBar
+          activeTab={activeTab}
+          passedModules={passedModules}
+          onSelectTab={handleSelectTab}
+        />
+
         <PassBanner
           notification={passNotification}
           remainingSec={remainingSec}
@@ -260,9 +302,12 @@ export const App: React.FC = () => {
         {activeTab === 'history' && (
           <BatchHistoryTable
             records={batchHistory}
+            metadata={batchMetadata}
+            onMetadataChange={setBatchMetadata}
             onClearHistory={() => {
               setBatchHistory([]);
               setPassedModules(new Set());
+              localStorage.removeItem('hw_batch_history');
             }}
           />
         )}
