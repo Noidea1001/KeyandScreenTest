@@ -22,10 +22,12 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
 }) => {
   const [verifiedParts, setVerifiedParts] = useState<Set<string>>(new Set());
   const [micVolume, setMicVolume] = useState<number>(0);
+  const [micLoopback, setMicLoopback] = useState<boolean>(false);
   const [micStatus, setMicStatus] = useState<string>('Idle — Click Start to test microphone');
   const [cameraStatus, setCameraStatus] = useState<string>('Idle — Click Start to test camera');
 
   const micCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const micLoopbackGainRef = useRef<GainNode | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasTriggeredPassRef = useRef<boolean>(false);
 
@@ -68,6 +70,12 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
       analyser.fftSize = 256;
       source.connect(analyser);
 
+      const loopbackGain = audioCtx.createGain();
+      loopbackGain.gain.value = micLoopback ? 0.8 : 0;
+      source.connect(loopbackGain);
+      loopbackGain.connect(audioCtx.destination);
+      micLoopbackGainRef.current = loopbackGain;
+
       const buffer = new Uint8Array(analyser.frequencyBinCount);
       const drawLoop = () => {
         const canvas = micCanvasRef.current;
@@ -98,6 +106,15 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
       drawLoop();
     } catch {
       setMicStatus('Permission denied or no microphone hardware detected');
+    }
+  };
+
+  const toggleMicLoopback = () => {
+    onActivity();
+    const next = !micLoopback;
+    setMicLoopback(next);
+    if (micLoopbackGainRef.current) {
+      micLoopbackGainRef.current.gain.value = next ? 0.8 : 0;
     }
   };
 
@@ -205,6 +222,14 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
             <button className="btn btn-primary" onClick={startMicrophoneTest}>
               <Mic size={14} />
               <span>Start Microphone</span>
+            </button>
+            <button
+              className={`btn ${micLoopback ? 'btn-primary' : 'btn-secondary'}`}
+              onClick={toggleMicLoopback}
+              title="Route microphone input to speakers (use headphones to avoid feedback)"
+            >
+              <Volume2 size={14} />
+              <span>{micLoopback ? 'Loopback: ON' : 'Loopback: OFF'}</span>
             </button>
             <button className="btn" onClick={() => markPartVerified('mic')}>
               <Check size={14} />
