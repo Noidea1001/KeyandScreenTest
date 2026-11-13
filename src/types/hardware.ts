@@ -4,9 +4,13 @@ export type ModuleTab =
   | 'screen'
   | 'media'
   | 'gamepad'
+  | 'touch'
+  | 'system'
   | 'history';
 
 export type ThemeMode = 'dark' | 'light';
+
+export type KeyboardOSMode = 'win' | 'mac';
 
 export type KeyboardLayoutType =
   | 'full'
