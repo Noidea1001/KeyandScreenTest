@@ -1,6 +1,6 @@
 import React from 'react';
 import { Download, FileJson, Printer, Trash2, CheckCircle2 } from 'lucide-react';
-import { BatchRecord } from '../types/hardware';
+import { BatchMetadata, BatchRecord } from '../types/hardware';
 import {
   exportBatchHistoryCSV,
   exportBatchHistoryJSON
@@ -8,11 +8,15 @@ import {
 
 interface BatchHistoryTableProps {
   records: BatchRecord[];
+  metadata?: BatchMetadata;
+  onMetadataChange?: (next: BatchMetadata) => void;
   onClearHistory: () => void;
 }
 
 export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
   records,
+  metadata = { technician: '', assetTag: '' },
+  onMetadataChange,
   onClearHistory
 }) => {
   return (
@@ -21,6 +25,8 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
         <h2>Hardware Diagnostic Suite — QA Verification Certificate</h2>
         <p>
           Generated: {new Date().toLocaleString()} · Verified Modules: {records.length}
+          {metadata.assetTag ? ` · Asset / Serial: ${metadata.assetTag}` : ''}
+          {metadata.technician ? ` · Technician: ${metadata.technician}` : ''}
         </p>
       </div>
       <div className="batch-log-container">
@@ -34,7 +40,7 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
           <div className="card-actions">
             <button
               className="btn btn-primary"
-              onClick={() => exportBatchHistoryCSV(records)}
+              onClick={() => exportBatchHistoryCSV(records, metadata)}
               disabled={records.length === 0}
             >
               <Download size={15} />
@@ -42,7 +48,7 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
             </button>
             <button
               className="btn btn-secondary"
-              onClick={() => exportBatchHistoryJSON(records)}
+              onClick={() => exportBatchHistoryJSON(records, metadata)}
               disabled={records.length === 0}
             >
               <FileJson size={15} />
@@ -65,6 +71,33 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
               <span>Clear Session Log</span>
             </button>
           </div>
+        </div>
+
+        <div className="batch-meta-bar">
+          <label className="batch-meta-field">
+            <span>Technician Name</span>
+            <input
+              type="text"
+              className="btn text-input"
+              placeholder="e.g. Alex M."
+              value={metadata.technician}
+              onChange={(e) =>
+                onMetadataChange?.({ ...metadata, technician: e.target.value })
+              }
+            />
+          </label>
+          <label className="batch-meta-field">
+            <span>Asset Tag / Serial #</span>
+            <input
+              type="text"
+              className="btn text-input"
+              placeholder="e.g. SN-2026-9941"
+              value={metadata.assetTag}
+              onChange={(e) =>
+                onMetadataChange?.({ ...metadata, assetTag: e.target.value })
+              }
+            />
+          </label>
         </div>
 
         <table className="batch-table">
