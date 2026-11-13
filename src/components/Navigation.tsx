@@ -5,6 +5,8 @@ import {
   Monitor,
   Headphones,
   Gamepad2,
+  Fingerprint,
+  Cpu,
   ClipboardList
 } from 'lucide-react';
 import { ModuleTab } from '../types/hardware';
@@ -28,6 +30,8 @@ export const Navigation: React.FC<NavigationProps> = ({
     { id: 'screen', label: 'Display & Monitor', icon: <Monitor size={16} /> },
     { id: 'media', label: 'Audio, Mic & Camera', icon: <Headphones size={16} /> },
     { id: 'gamepad', label: 'Controller & Axis', icon: <Gamepad2 size={16} /> },
+    { id: 'touch', label: 'Touch & Stylus', icon: <Fingerprint size={16} /> },
+    { id: 'system', label: 'System & Battery', icon: <Cpu size={16} /> },
     {
       id: 'history',
       label: `Batch Log (${historyCount})`,
