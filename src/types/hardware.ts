@@ -50,6 +50,11 @@ export interface BatchRecord {
   timestamp: string;
 }
 
+export interface BatchMetadata {
+  technician: string;
+  assetTag: string;
+}
+
 export interface PassNotification {
   module: ModuleTab;
   title: string;
