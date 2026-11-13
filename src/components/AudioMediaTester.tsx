@@ -25,14 +25,35 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
   const [micLoopback, setMicLoopback] = useState<boolean>(false);
   const [micStatus, setMicStatus] = useState<string>('Idle — Click Start to test microphone');
   const [cameraStatus, setCameraStatus] = useState<string>('Idle — Click Start to test camera');
+  const [audioDevices, setAudioDevices] = useState<MediaDeviceInfo[]>([]);
+  const [videoDevices, setVideoDevices] = useState<MediaDeviceInfo[]>([]);
+  const [selectedMicId, setSelectedMicId] = useState<string>('');
+  const [selectedCamId, setSelectedCamId] = useState<string>('');
+  const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
 
   const micCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const micLoopbackGainRef = useRef<GainNode | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasTriggeredPassRef = useRef<boolean>(false);
 
+  const refreshDeviceList = useCallback(async () => {
+    if (!navigator.mediaDevices?.enumerateDevices) return;
+    try {
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      setAudioDevices(devices.filter((d) => d.kind === 'audioinput'));
+      setVideoDevices(devices.filter((d) => d.kind === 'videoinput'));
+    } catch {
+      // ignore enumeration errors on restricted environments
+    }
+  }, []);
+
+  useEffect(() => {
+    void refreshDeviceList();
+  }, [refreshDeviceList]);
+
   const resetMediaState = useCallback(() => {
     setVerifiedParts(new Set());
+    setSnapshotUrl(null);
     hasTriggeredPassRef.current = false;
   }, []);
 
@@ -59,7 +80,10 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
   const startMicrophoneTest = async () => {
     onActivity();
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        audio: selectedMicId ? { deviceId: { exact: selectedMicId } } : true
+      });
+      void refreshDeviceList();
       setMicStatus('Active — Capturing real-time audio spectrum');
       const AudioCtx =
         window.AudioContext ||
@@ -121,7 +145,10 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
   const startCameraTest = async () => {
     onActivity();
     try {
-      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: selectedCamId ? { deviceId: { exact: selectedCamId } } : true
+      });
+      void refreshDeviceList();
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
         videoRef.current.onloadedmetadata = () => {
@@ -134,6 +161,19 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
     } catch {
       setCameraStatus('Permission denied or no camera device detected');
     }
+  };
+
+  const captureCameraSnapshot = () => {
+    onActivity();
+    const video = videoRef.current;
+    if (!video || video.videoWidth === 0 || video.videoHeight === 0) return;
+    const canvas = document.createElement('canvas');
+    canvas.width = video.videoWidth;
+    canvas.height = video.videoHeight;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) return;
+    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+    setSnapshotUrl(canvas.toDataURL('image/png'));
   };
 
   return (
@@ -205,6 +245,22 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
             <p className="card-desc">
               Verify audio capture sensitivity and inspect real-time frequency response.
             </p>
+            {audioDevices.length > 0 && (
+              <select
+                className="btn select-input"
+                style={{ width: '100%', marginBottom: '0.6rem' }}
+                value={selectedMicId}
+                onChange={(e) => setSelectedMicId(e.target.value)}
+                aria-label="Select Microphone Device"
+              >
+                <option value="">Default Microphone</option>
+                {audioDevices.map((d, i) => (
+                  <option key={d.deviceId || i} value={d.deviceId}>
+                    {d.label || `Microphone ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+            )}
             <canvas
               ref={micCanvasRef}
               className="visualizer-canvas"
@@ -252,7 +308,28 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
             <p className="card-desc">
               Inspect webcam sensor clarity, framing, and native hardware resolution.
             </p>
+            {videoDevices.length > 0 && (
+              <select
+                className="btn select-input"
+                style={{ width: '100%', marginBottom: '0.6rem' }}
+                value={selectedCamId}
+                onChange={(e) => setSelectedCamId(e.target.value)}
+                aria-label="Select Camera Device"
+              >
+                <option value="">Default Camera</option>
+                {videoDevices.map((d, i) => (
+                  <option key={d.deviceId || i} value={d.deviceId}>
+                    {d.label || `Camera ${i + 1}`}
+                  </option>
+                ))}
+              </select>
+            )}
             <video ref={videoRef} id="webcamVideo" autoPlay playsInline muted />
+            {snapshotUrl && (
+              <div className="snapshot-preview-box">
+                <img src={snapshotUrl} alt="Webcam focus snapshot" />
+              </div>
+            )}
             <div className="media-meta-row">
               <span>{cameraStatus}</span>
             </div>
@@ -261,6 +338,10 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
             <button className="btn btn-primary" onClick={startCameraTest}>
               <Camera size={14} />
               <span>Start Camera</span>
+            </button>
+            <button className="btn btn-secondary" onClick={captureCameraSnapshot}>
+              <Camera size={14} />
+              <span>Capture Snapshot</span>
             </button>
             <button className="btn" onClick={() => markPartVerified('webcam')}>
               <Check size={14} />
