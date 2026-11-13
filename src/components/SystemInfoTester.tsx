@@ -3,6 +3,7 @@ import {
   Cpu,
   BatteryCharging,
   MonitorSmartphone,
+  Wifi,
   CheckCircle2,
   RefreshCw
 } from 'lucide-react';
@@ -109,6 +110,16 @@ export const SystemInfoTester: React.FC<SystemInfoTesterProps> = ({
     typeof window.matchMedia === 'function' &&
     window.matchMedia('(color-gamut: p3)').matches;
   const maxTouchPoints = navigator.maxTouchPoints ?? 0;
+  const navExtra = navigator as Navigator & {
+    connection?: { effectiveType?: string; downlink?: number; rtt?: number };
+    usb?: unknown;
+    hid?: unknown;
+    bluetooth?: unknown;
+  };
+  const netConn = navExtra.connection;
+  const hasWebUSB = 'usb' in navExtra;
+  const hasWebHID = 'hid' in navExtra;
+  const hasWebBT = 'bluetooth' in navExtra;
 
   const handleLogSystemPass = () => {
     onActivity();
@@ -243,6 +254,37 @@ export const SystemInfoTester: React.FC<SystemInfoTesterProps> = ({
                 Battery Status API is not exposed by this browser/desktop environment.
               </p>
             )}
+          </div>
+
+          <div className="system-info-card">
+            <div className="stat-label">
+              <Wifi size={15} />
+              <span>Network & Peripheral Buses</span>
+            </div>
+            <dl className="system-kv-list">
+              <div>
+                <dt>Link Profile</dt>
+                <dd>
+                  {netConn
+                    ? `${(netConn.effectiveType || 'unknown').toUpperCase()} · ${netConn.downlink ?? '?'} Mbps · ${netConn.rtt ?? '?'} ms`
+                    : online
+                      ? 'Connected (NetworkInfo N/A)'
+                      : 'Offline'}
+                </dd>
+              </div>
+              <div>
+                <dt>WebUSB API</dt>
+                <dd>{hasWebUSB ? 'Supported' : 'Unavailable'}</dd>
+              </div>
+              <div>
+                <dt>WebHID API</dt>
+                <dd>{hasWebHID ? 'Supported' : 'Unavailable'}</dd>
+              </div>
+              <div>
+                <dt>Web Bluetooth</dt>
+                <dd>{hasWebBT ? 'Supported' : 'Unavailable'}</dd>
+              </div>
+            </dl>
           </div>
         </div>
       </div>
