@@ -22,9 +22,19 @@ import {
 } from '../data/keyboardLayouts';
 import {
   KeyboardLayoutType,
+  KeyboardOSMode,
   KeyDefinition,
   KeyboardSectionVisibility
 } from '../types/hardware';
+
+const MAC_KEY_LABELS: Record<string, string> = {
+  MetaLeft: 'CMD',
+  MetaRight: 'CMD',
+  AltLeft: 'OPT',
+  AltRight: 'OPT',
+  Enter: 'RETURN',
+  Backspace: 'DELETE'
+};
 import { soundEngine } from '../utils/soundEngine';
 import { resolveMatchedKeyCodes } from '../utils/keyMatcher';
 
@@ -53,6 +63,7 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
   );
   const [excludedCodes, setExcludedCodes] = useState<Set<string>>(new Set());
   const [unitSize, setUnitSize] = useState<number>(58);
+  const [osMode, setOsMode] = useState<KeyboardOSMode>('win');
   const [testedCodes, setTestedCodes] = useState<Set<string>>(new Set());
   const [pressedCodes, setPressedCodes] = useState<Set<string>>(new Set());
   const [pressCounts, setPressCounts] = useState<Record<string, number>>({});
@@ -283,23 +294,28 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
       .filter(Boolean)
       .join(' ');
 
+    const displayLabel =
+      osMode === 'mac' && MAC_KEY_LABELS[k.code]
+        ? MAC_KEY_LABELS[k.code]
+        : k.label;
+
     return (
       <div
         key={k.code}
         className={classes}
         title={
           isExcluded
-            ? `${k.label} (${k.code}) — Excluded from target count. Right-click to enable.`
-            : `${k.label} (${k.code}) — Left-click to test, Right-click to exclude if missing on your keyboard.`
+            ? `${displayLabel} (${k.code}) — Excluded from target count. Right-click to enable.`
+            : `${displayLabel} (${k.code}) — Left-click to test, Right-click to exclude if missing on your keyboard.`
         }
         onClick={() => {
-          handleKeyPressBatch([k.code], k.label, false);
+          handleKeyPressBatch([k.code], displayLabel, false);
           setTimeout(() => handleKeyReleaseBatch([k.code]), 110);
         }}
         onContextMenu={(e) => toggleExcludeSingleKey(k.code, e)}
       >
         {count > 0 && <span className="key-count-badge">{count}</span>}
-        <span className="key-main-label">{k.label}</span>
+        <span className="key-main-label">{displayLabel}</span>
         {k.sub && <span className="key-sub">{k.sub}</span>}
       </div>
     );
@@ -420,6 +436,16 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
             <option value={58}>Large Full-Width (58px)</option>
             <option value={52}>Medium (52px)</option>
             <option value={46}>Compact (46px)</option>
+          </select>
+
+          <select
+            className="btn select-input"
+            value={osMode}
+            onChange={(e) => setOsMode(e.target.value as KeyboardOSMode)}
+            title="Switch keycap legends between Windows/PC and macOS"
+          >
+            <option value="win">PC / WIN</option>
+            <option value="mac">macOS / CMD</option>
           </select>
 
           <button className="btn" onClick={resetKeyboardState}>
