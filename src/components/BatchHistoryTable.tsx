@@ -1,7 +1,10 @@
 import React from 'react';
-import { Download, Trash2, CheckCircle2 } from 'lucide-react';
+import { Download, FileJson, Trash2, CheckCircle2 } from 'lucide-react';
 import { BatchRecord } from '../types/hardware';
-import { exportBatchHistoryCSV } from '../utils/csvExport';
+import {
+  exportBatchHistoryCSV,
+  exportBatchHistoryJSON
+} from '../utils/csvExport';
 
 interface BatchHistoryTableProps {
   records: BatchRecord[];
@@ -30,6 +33,14 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
             >
               <Download size={15} />
               <span>Export CSV Report</span>
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => exportBatchHistoryJSON(records)}
+              disabled={records.length === 0}
+            >
+              <FileJson size={15} />
+              <span>Export JSON Report</span>
             </button>
             <button
               className="btn btn-danger"
