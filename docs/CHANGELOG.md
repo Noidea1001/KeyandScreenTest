@@ -2,6 +2,15 @@
 
 All notable changes to the **Hardware Diagnostic Suite** project are documented in this file.
 
+## [v2.3.0] - 2026-11-13
+### Added
+- **Touchscreen & Stylus Tester**: Added `TouchTester` with a 24-cell (`6×4`) dead-zone swipe/tap grid, active/max simultaneous multi-touch tracking, stylus pressure & tilt telemetry, and auto-PASS.
+- **System, GPU & Battery Telemetry**: Added `SystemInfoTester` for CPU threads, device memory, WebGL GPU vendor/renderer, display DPR/P3 color gamut, live Battery Status API, and manual PASS logging.
+- **Printable / PDF QA Certificate**: Added `Print / PDF Certificate` button and `@media print` styling in `BatchHistoryTable`.
+- **macOS Keycap Legend Mode**: Added `PC / WIN` vs `macOS / CMD` legend toggle (`CMD`, `OPT`, `RETURN`, `DELETE`) in `KeyboardTester`.
+- **Live Microphone Loopback**: Added a `Loopback: ON/OFF` audio monitoring toggle in `AudioMediaTester`.
+- **Component Unit Tests**: Added React Testing Library tests for `TouchTester`, `SystemInfoTester`, and `BatchHistoryTable`.
+
 ## [v2.2.0] - 2026-11-13
 ### Added
 - **Offline PWA Support**: Configured `vite-plugin-pwa` with Workbox precaching and linked `public/manifest.json` in `index.html` for full offline diagnostic operation.
