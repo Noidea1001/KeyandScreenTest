@@ -1375,3 +1375,72 @@ body {
   object-fit: cover;
   display: block;
 }
+
+/* FAIL Badge */
+.badge-fail {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  background: rgba(239, 68, 68, 0.14);
+  color: #ef4444;
+  border: 1px solid rgba(239, 68, 68, 0.45);
+  padding: 0.15rem 0.5rem;
+  border-radius: 4px;
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 0.72rem;
+}
+
+/* Gamepad Analog Stick Plots */
+.stick-plots-row {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 1.5rem;
+  margin: 0.75rem 0;
+}
+
+.stick-plot-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.stick-svg {
+  width: 112px;
+  height: 112px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 50%;
+}
+
+.stick-ring {
+  fill: none;
+  stroke: var(--border-subtle);
+  stroke-width: 1.5;
+}
+
+.stick-crosshair {
+  stroke: var(--border-color);
+  stroke-width: 1;
+}
+
+.stick-dot {
+  fill: var(--accent-blue);
+}
+
+.stick-label {
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--text-secondary);
+}
+
+/* Speaker Frequency Rattle Row */
+.speaker-freq-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+  margin-top: 0.75rem;
+}
