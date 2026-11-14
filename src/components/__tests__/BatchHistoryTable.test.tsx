@@ -46,4 +46,32 @@ describe('BatchHistoryTable', () => {
     fireEvent.click(screen.getByText('Print / PDF Certificate'));
     expect(printSpy).toHaveBeenCalledTimes(1);
   });
+
+  it('supports logging a FAIL defect and filtering by search query', () => {
+    const onLogFail = vi.fn();
+    render(
+      <BatchHistoryTable
+        records={[
+          ...RECORDS,
+          {
+            id: 2,
+            module: 'Mouse — FAIL',
+            details: 'Double click fault on LMB',
+            status: 'FAIL',
+            timestamp: '20:51:00'
+          }
+        ]}
+        onLogFail={onLogFail}
+        onClearHistory={vi.fn()}
+      />
+    );
+
+    const searchInput = screen.getByPlaceholderText('Filter by module or note...');
+    fireEvent.change(searchInput, { target: { value: 'Double click' } });
+    expect(screen.queryByText('Keyboard Verified — PASS')).toBeNull();
+    expect(screen.getByText('Mouse — FAIL')).toBeTruthy();
+
+    fireEvent.click(screen.getByText('Log Defect (FAIL)'));
+    expect(onLogFail).toHaveBeenCalledTimes(1);
+  });
 });
