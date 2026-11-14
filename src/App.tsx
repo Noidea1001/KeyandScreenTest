@@ -187,6 +187,23 @@ export const App: React.FC = () => {
     [activeTab, resetDurationSec]
   );
 
+  const handleLogFail = useCallback((moduleName: string, details: string) => {
+    setBatchHistory((prev) => [
+      {
+        id: prev.length + 1,
+        module: moduleName,
+        details,
+        status: 'FAIL',
+        timestamp: new Date().toLocaleTimeString([], {
+          hour: '2-digit',
+          minute: '2-digit',
+          second: '2-digit'
+        })
+      },
+      ...prev
+    ]);
+  }, []);
+
   const handleDurationChange = (seconds: number) => {
     setResetDurationSec(seconds);
     setRemainingSec(seconds);
@@ -304,6 +321,7 @@ export const App: React.FC = () => {
             records={batchHistory}
             metadata={batchMetadata}
             onMetadataChange={setBatchMetadata}
+            onLogFail={handleLogFail}
             onClearHistory={() => {
               setBatchHistory([]);
               setPassedModules(new Set());
