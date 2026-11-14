@@ -23,6 +23,7 @@ import {
 import {
   KeyboardLayoutType,
   KeyboardOSMode,
+  KeyboardStandard,
   KeyDefinition,
   KeyboardSectionVisibility
 } from '../types/hardware';
@@ -64,6 +65,7 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
   const [excludedCodes, setExcludedCodes] = useState<Set<string>>(new Set());
   const [unitSize, setUnitSize] = useState<number>(58);
   const [osMode, setOsMode] = useState<KeyboardOSMode>('win');
+  const [kbStandard, setKbStandard] = useState<KeyboardStandard>('ansi');
   const [testedCodes, setTestedCodes] = useState<Set<string>>(new Set());
   const [pressedCodes, setPressedCodes] = useState<Set<string>>(new Set());
   const [pressCounts, setPressCounts] = useState<Record<string, number>>({});
@@ -81,10 +83,13 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
   const keyDownTimeRef = React.useRef<Record<string, number>>({});
   const hasTriggeredPassRef = React.useRef<boolean>(false);
 
-  const targetCodes = useMemo(
-    () => new Set(getTargetKeyCodes(sections, excludedCodes)),
-    [sections, excludedCodes]
-  );
+  const targetCodes = useMemo(() => {
+    const set = new Set(getTargetKeyCodes(sections, excludedCodes));
+    if (kbStandard === 'iso' && !excludedCodes.has('IntlBackslash')) {
+      set.add('IntlBackslash');
+    }
+    return set;
+  }, [sections, excludedCodes, kbStandard]);
 
   const resetKeyboardState = useCallback(() => {
     setTestedCodes(new Set());
@@ -470,6 +475,16 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
             <option value="mac">macOS / CMD</option>
           </select>
 
+          <select
+            className="btn select-input"
+            value={kbStandard}
+            onChange={(e) => setKbStandard(e.target.value as KeyboardStandard)}
+            title="Switch physical key layout between ANSI (104) and ISO (105 UK/EU)"
+          >
+            <option value="ansi">ANSI (104)</option>
+            <option value="iso">ISO (105 EU)</option>
+          </select>
+
           <button className="btn" onClick={resetKeyboardState}>
             <RotateCcw size={14} />
             <span>Reset</span>
@@ -571,12 +586,20 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
           <div className="kb-section">
             {MAIN_ALPHANUMERIC_ROWS.map((row, rIdx) => {
               if (!sections.fnRow && rIdx === 0) return null;
+              const displayRow =
+                kbStandard === 'iso' && rIdx === 4
+                  ? [
+                      { code: 'ShiftLeft', label: 'SHIFT', width: 'u-125' },
+                      { code: 'IntlBackslash', label: '>', sub: '<' },
+                      ...row.slice(1)
+                    ]
+                  : row;
               return (
                 <div
                   key={`main-row-${rIdx}`}
                   className={`kb-row ${rIdx === 0 ? 'fn-row' : ''}`}
                 >
-                  {row.map((k, kIdx) => renderKey(k, kIdx))}
+                  {displayRow.map((k, kIdx) => renderKey(k, kIdx))}
                 </div>
               );
             })}
