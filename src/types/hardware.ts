@@ -12,6 +12,8 @@ export type ThemeMode = 'dark' | 'light';
 
 export type KeyboardOSMode = 'win' | 'mac';
 
+export type KeyboardStandard = 'ansi' | 'iso';
+
 export type KeyboardLayoutType =
   | 'full'
   | '96'
@@ -46,7 +48,7 @@ export interface BatchRecord {
   id: number;
   module: string;
   details: string;
-  status: 'PASS';
+  status: 'PASS' | 'FAIL';
   timestamp: string;
 }
 
