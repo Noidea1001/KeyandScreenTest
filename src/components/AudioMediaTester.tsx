@@ -30,6 +30,7 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
   const [selectedMicId, setSelectedMicId] = useState<string>('');
   const [selectedCamId, setSelectedCamId] = useState<string>('');
   const [snapshotUrl, setSnapshotUrl] = useState<string | null>(null);
+  const [toneWaveform, setToneWaveform] = useState<'sine' | 'square'>('sine');
 
   const micCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const micLoopbackGainRef = useRef<GainNode | null>(null);
@@ -222,6 +223,29 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
                 <Waves size={14} />
                 <span>Frequency Sweep</span>
               </button>
+            </div>
+            <div className="speaker-freq-row">
+              <span className="toolbar-label">Rattle / Tone Check:</span>
+              {[80, 440, 1000, 8000, 14000].map((hz) => (
+                <button
+                  key={hz}
+                  className="btn btn-chip chip-on"
+                  onClick={() => soundEngine.playFrequencyTone(hz, toneWaveform)}
+                >
+                  {hz >= 1000 ? `${hz / 1000} kHz` : `${hz} Hz`}
+                </button>
+              ))}
+              <select
+                className="btn select-input"
+                value={toneWaveform}
+                onChange={(e) =>
+                  setToneWaveform(e.target.value as 'sine' | 'square')
+                }
+                aria-label="Tone Waveform"
+              >
+                <option value="sine">Sine</option>
+                <option value="square">Square</option>
+              </select>
             </div>
           </div>
           <button
