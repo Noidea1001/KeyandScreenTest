@@ -101,6 +101,26 @@ class SoundEngine {
     }
     gain.connect(this.ctx.destination);
   }
+
+  public playFrequencyTone(hz: number, waveform: OscillatorType = 'sine'): void {
+    this.init();
+    if (!this.ctx) return;
+
+    const now = this.ctx.currentTime;
+    const osc = this.ctx.createOscillator();
+    const gain = this.ctx.createGain();
+
+    osc.type = waveform;
+    osc.frequency.setValueAtTime(hz, now);
+
+    gain.gain.setValueAtTime(0.2, now);
+    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.75);
+
+    osc.connect(gain);
+    gain.connect(this.ctx.destination);
+    osc.start(now);
+    osc.stop(now + 0.76);
+  }
 }
 
 export const soundEngine = new SoundEngine();
