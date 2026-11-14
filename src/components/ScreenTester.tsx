@@ -36,10 +36,16 @@ export const ScreenTester: React.FC<ScreenTesterProps> = ({
   const [fps, setFps] = useState<number>(60);
   const [overlayGroup, setOverlayGroup] = useState<OverlayGroup>(null);
   const [patternIndex, setPatternIndex] = useState<number>(0);
+  const [motionSpeed, setMotionSpeed] = useState<1 | 2 | 4>(1);
 
   const motionCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const motionSpeedRef = useRef<number>(1);
   const overlayRef = useRef<HTMLDivElement | null>(null);
   const hasTriggeredPassRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    motionSpeedRef.current = motionSpeed;
+  }, [motionSpeed]);
 
   const resetScreenState = useCallback(() => {
     setPassedSteps(new Set());
@@ -83,7 +89,7 @@ export const ScreenTester: React.FC<ScreenTesterProps> = ({
         const ctx = canvas.getContext('2d');
         if (ctx) {
           ctx.clearRect(0, 0, canvas.width, canvas.height);
-          xPos = (xPos + 5) % canvas.width;
+          xPos = (xPos + 5 * motionSpeedRef.current) % canvas.width;
           ctx.fillStyle = '#3b82f6';
           ctx.fillRect(xPos, 12, 18, 46);
           ctx.fillStyle = '#10b981';
@@ -294,6 +300,16 @@ export const ScreenTester: React.FC<ScreenTesterProps> = ({
             />
           </div>
           <div className="card-actions">
+            <select
+              className="btn select-input"
+              value={motionSpeed}
+              onChange={(e) => setMotionSpeed(Number(e.target.value) as 1 | 2 | 4)}
+              aria-label="Motion Bar Speed"
+            >
+              <option value={1}>Speed: 1x (Standard)</option>
+              <option value={2}>Speed: 2x (Fast)</option>
+              <option value={4}>Speed: 4x (Ghosting Stress)</option>
+            </select>
             <button className="btn" onClick={() => markStepVerified(4)}>
               <Check size={14} />
               <span>Confirm Motion Stability</span>
