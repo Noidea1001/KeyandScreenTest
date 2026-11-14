@@ -31,5 +31,10 @@ export const GRADIENT_PATTERNS: ScreenTestPattern[] = [
     name: 'Subpixel Alignment & Sharpness Grid',
     background:
       'repeating-linear-gradient(0deg, #111 0px, #111 1px, transparent 1px, transparent 20px), repeating-linear-gradient(90deg, #111 0px, #111 1px, #eee 1px, #eee 20px)'
+  },
+  {
+    name: 'SMPTE Broadcast Color Bars',
+    background:
+      'linear-gradient(90deg, #c0c0c0 0% 14.28%, #c0c000 14.28% 28.56%, #00c0c0 28.56% 42.84%, #00c000 42.84% 57.12%, #c000c0 57.12% 71.4%, #c00000 71.4% 85.68%, #0000c0 85.68% 100%)'
   }
 ];
