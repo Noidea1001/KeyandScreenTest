@@ -42,6 +42,10 @@ export const MouseTester: React.FC<MouseTesterProps> = ({
   const [doubleClickFaults, setDoubleClickFaults] = useState(0);
   const [coords, setCoords] = useState({ x: 0, y: 0 });
   const [dragDistance, setDragDistance] = useState(0);
+  const [estimatedDpi, setEstimatedDpi] = useState<number | null>(null);
+  const [isCalibratingDpi, setIsCalibratingDpi] = useState(false);
+
+  const dpiOriginXRef = useRef<number | null>(null);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const lastClickTimeRef = useRef<Record<number, number>>({});
@@ -387,10 +391,31 @@ export const MouseTester: React.FC<MouseTesterProps> = ({
                 Hold and drag across the surface to verify continuous switch contact and measure sensor smoothness.
               </p>
             </div>
-            <button className="btn" onClick={drawGrid}>
-              <Eraser size={14} />
-              <span>Clear Surface</span>
-            </button>
+            <div className="card-actions">
+              <button
+                className={`btn ${isCalibratingDpi ? 'btn-primary' : 'btn-secondary'}`}
+                onClick={() => {
+                  onActivity();
+                  if (!isCalibratingDpi) {
+                    dpiOriginXRef.current = null;
+                    setIsCalibratingDpi(true);
+                  } else {
+                    setIsCalibratingDpi(false);
+                  }
+                }}
+                title="Click Start, move mouse physically 1 inch (2.54 cm) horizontally across the canvas, then click Stop"
+              >
+                <span>
+                  {isCalibratingDpi
+                    ? 'Stop 1-Inch DPI Check'
+                    : 'Estimate DPI (Move 1 in)'}
+                </span>
+              </button>
+              <button className="btn" onClick={drawGrid}>
+                <Eraser size={14} />
+                <span>Clear Surface</span>
+              </button>
+            </div>
           </div>
 
           <canvas
@@ -408,7 +433,18 @@ export const MouseTester: React.FC<MouseTesterProps> = ({
                 y: (e.clientY - rect.top) * (e.currentTarget.height / rect.height)
               };
             }}
-            onMouseMove={handleCanvasMouseMove}
+            onMouseMove={(e) => {
+              if (isCalibratingDpi) {
+                if (dpiOriginXRef.current === null) {
+                  dpiOriginXRef.current = e.clientX;
+                } else {
+                  setEstimatedDpi(
+                    Math.round(Math.abs(e.clientX - dpiOriginXRef.current))
+                  );
+                }
+              }
+              handleCanvasMouseMove(e);
+            }}
             onContextMenu={(e) => e.preventDefault()}
           />
 
@@ -418,6 +454,12 @@ export const MouseTester: React.FC<MouseTesterProps> = ({
             </span>
             <span>
               Continuous Drag Path: <strong>{dragDistance} px</strong>
+            </span>
+            <span>
+              Estimated Effective DPI:{' '}
+              <strong>
+                {estimatedDpi !== null ? `~${estimatedDpi} px/in` : '—'}
+              </strong>
             </span>
           </div>
         </div>
