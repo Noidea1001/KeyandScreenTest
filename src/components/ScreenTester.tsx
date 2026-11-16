@@ -26,6 +26,8 @@ interface ScreenTesterProps {
 
 type OverlayGroup = 'deadpixel' | 'uniformity' | 'gradient' | null;
 
+const EXERCISER_COLORS = ['#ff0000', '#00ff00', '#0000ff', '#ffffff', '#000000'];
+
 export const ScreenTester: React.FC<ScreenTesterProps> = ({
   isActive,
   resetSignal,
@@ -37,6 +39,8 @@ export const ScreenTester: React.FC<ScreenTesterProps> = ({
   const [overlayGroup, setOverlayGroup] = useState<OverlayGroup>(null);
   const [patternIndex, setPatternIndex] = useState<number>(0);
   const [motionSpeed, setMotionSpeed] = useState<1 | 2 | 4>(1);
+  const [isExercising, setIsExercising] = useState<boolean>(false);
+  const [exerciserColorIdx, setExerciserColorIdx] = useState<number>(0);
 
   const motionCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const motionSpeedRef = useRef<number>(1);
@@ -46,6 +50,21 @@ export const ScreenTester: React.FC<ScreenTesterProps> = ({
   useEffect(() => {
     motionSpeedRef.current = motionSpeed;
   }, [motionSpeed]);
+
+  useEffect(() => {
+    if (!isExercising) return;
+    const id = setInterval(() => {
+      setExerciserColorIdx((i) => (i + 1) % EXERCISER_COLORS.length);
+    }, 33);
+    const onEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsExercising(false);
+    };
+    window.addEventListener('keydown', onEsc);
+    return () => {
+      clearInterval(id);
+      window.removeEventListener('keydown', onEsc);
+    };
+  }, [isExercising]);
 
   const resetScreenState = useCallback(() => {
     setPassedSteps(new Set());
@@ -232,6 +251,15 @@ export const ScreenTester: React.FC<ScreenTesterProps> = ({
               <Maximize2 size={14} />
               <span>Launch Fullscreen Pattern</span>
             </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => {
+                onActivity();
+                setIsExercising(true);
+              }}
+            >
+              <span>Stuck-Pixel Exerciser</span>
+            </button>
             <button className="btn" onClick={() => markStepVerified(1)}>
               <Check size={14} />
               <span>Confirm Zero Defect Pixels</span>
@@ -350,6 +378,23 @@ export const ScreenTester: React.FC<ScreenTesterProps> = ({
             </strong>
             <span>Click or press SPACE for next pattern</span>
             <span>Press ESC or click here to exit</span>
+          </div>
+        </div>
+      )}
+
+      {/* Rapid RGB Stuck-Pixel Exerciser Overlay */}
+      {isExercising && (
+        <div
+          id="screenOverlay"
+          style={{
+            display: 'block',
+            backgroundColor: EXERCISER_COLORS[exerciserColorIdx]
+          }}
+          onClick={() => setIsExercising(false)}
+        >
+          <div className="overlay-hud">
+            <strong>Stuck-Pixel Exerciser Active (~30 Hz RGB Cycle)</strong>
+            <span>Click anywhere or press ESC to stop</span>
           </div>
         </div>
       )}
