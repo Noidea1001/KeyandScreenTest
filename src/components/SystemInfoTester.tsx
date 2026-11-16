@@ -4,6 +4,7 @@ import {
   BatteryCharging,
   MonitorSmartphone,
   Wifi,
+  Zap,
   CheckCircle2,
   RefreshCw
 } from 'lucide-react';
@@ -67,6 +68,12 @@ export const SystemInfoTester: React.FC<SystemInfoTesterProps> = ({
     dischargingTime: null
   });
   const [online, setOnline] = useState<boolean>(navigator.onLine);
+  const [benchOpsPerSec, setBenchOpsPerSec] = useState<number | null>(null);
+  const [isBenchmarking, setIsBenchmarking] = useState<boolean>(false);
+  const [storageInfo, setStorageInfo] = useState<{
+    usedMb: number;
+    quotaGb: number;
+  } | null>(null);
 
   const readBattery = async () => {
     const nav = navigator as Navigator & {
@@ -92,6 +99,17 @@ export const SystemInfoTester: React.FC<SystemInfoTesterProps> = ({
 
   useEffect(() => {
     void readBattery();
+    if (navigator.storage?.estimate) {
+      navigator.storage
+        .estimate()
+        .then((est) => {
+          setStorageInfo({
+            usedMb: Math.round((est.usage ?? 0) / (1024 * 1024)),
+            quotaGb: Number(((est.quota ?? 0) / (1024 * 1024 * 1024)).toFixed(1))
+          });
+        })
+        .catch(() => {});
+    }
     const onOnline = () => setOnline(true);
     const onOffline = () => setOnline(false);
     window.addEventListener('online', onOnline);
@@ -121,6 +139,27 @@ export const SystemInfoTester: React.FC<SystemInfoTesterProps> = ({
   const hasWebHID = 'hid' in navExtra;
   const hasWebBT = 'bluetooth' in navExtra;
 
+  const runCpuBenchmark = () => {
+    onActivity();
+    setIsBenchmarking(true);
+    setTimeout(() => {
+      const start = performance.now();
+      let ops = 0;
+      let acc = 0;
+      // 400ms tight math/prime stress loop to measure single-thread throughput
+      while (performance.now() - start < 400) {
+        for (let i = 2; i < 500; i++) {
+          acc += Math.sqrt(i) * Math.sin(i);
+          ops++;
+        }
+      }
+      const elapsedSec = (performance.now() - start) / 1000;
+      if (acc === Number.NEGATIVE_INFINITY) setBenchOpsPerSec(0);
+      setBenchOpsPerSec(Math.round(ops / elapsedSec / 1000));
+      setIsBenchmarking(false);
+    }, 20);
+  };
+
   const handleLogSystemPass = () => {
     onActivity();
     const batterySummary = battery.supported
@@ -143,6 +182,14 @@ export const SystemInfoTester: React.FC<SystemInfoTesterProps> = ({
             </p>
           </div>
           <div className="card-actions">
+            <button
+              className="btn btn-secondary"
+              onClick={runCpuBenchmark}
+              disabled={isBenchmarking}
+            >
+              <Zap size={15} />
+              <span>{isBenchmarking ? 'Benchmarking...' : 'Run CPU Benchmark'}</span>
+            </button>
             <button
               className="btn btn-secondary"
               onClick={() => {
@@ -182,6 +229,22 @@ export const SystemInfoTester: React.FC<SystemInfoTesterProps> = ({
               <div>
                 <dt>Network State</dt>
                 <dd>{online ? 'Online' : 'Offline (PWA Ready)'}</dd>
+              </div>
+              <div>
+                <dt>CPU Benchmark</dt>
+                <dd>
+                  {benchOpsPerSec !== null
+                    ? `${benchOpsPerSec.toLocaleString()} K ops/s`
+                    : 'Click Run CPU Benchmark'}
+                </dd>
+              </div>
+              <div>
+                <dt>Browser Storage Quota</dt>
+                <dd>
+                  {storageInfo
+                    ? `${storageInfo.usedMb} MB used / ${storageInfo.quotaGb} GB`
+                    : 'Not exposed'}
+                </dd>
               </div>
             </dl>
           </div>
