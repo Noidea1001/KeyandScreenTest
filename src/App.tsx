@@ -251,6 +251,7 @@ export const App: React.FC = () => {
           activeTab={activeTab}
           passedModules={passedModules}
           onSelectTab={handleSelectTab}
+          onReportFail={handleLogFail}
         />
 
         <PassBanner
