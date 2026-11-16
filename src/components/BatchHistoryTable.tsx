@@ -6,12 +6,14 @@ import {
   Trash2,
   CheckCircle2,
   AlertTriangle,
-  Search
+  Search,
+  ClipboardCopy
 } from 'lucide-react';
 import { BatchMetadata, BatchRecord } from '../types/hardware';
 import {
   exportBatchHistoryCSV,
-  exportBatchHistoryJSON
+  exportBatchHistoryJSON,
+  buildBatchTicketSummary
 } from '../utils/csvExport';
 
 interface BatchHistoryTableProps {
@@ -33,6 +35,19 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
   const [statusFilter, setStatusFilter] = useState<'ALL' | 'PASS' | 'FAIL'>('ALL');
   const [failModule, setFailModule] = useState('Keyboard');
   const [failDetails, setFailDetails] = useState('');
+  const [copiedSummary, setCopiedSummary] = useState(false);
+
+  const handleCopySummary = async () => {
+    if (records.length === 0) return;
+    const summary = buildBatchTicketSummary(records, metadata);
+    try {
+      await navigator.clipboard?.writeText(summary);
+      setCopiedSummary(true);
+      setTimeout(() => setCopiedSummary(false), 2000);
+    } catch {
+      // clipboard unavailable
+    }
+  };
 
   const filteredRecords = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -88,6 +103,14 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
             >
               <FileJson size={15} />
               <span>Export JSON Report</span>
+            </button>
+            <button
+              className="btn btn-secondary"
+              onClick={() => void handleCopySummary()}
+              disabled={records.length === 0}
+            >
+              <ClipboardCopy size={15} />
+              <span>{copiedSummary ? 'Copied!' : 'Copy Ticket Summary'}</span>
             </button>
             <button
               className="btn btn-secondary"
