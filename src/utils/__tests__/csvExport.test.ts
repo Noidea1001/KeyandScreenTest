@@ -2,7 +2,8 @@ import { describe, it, expect, vi, afterEach } from 'vitest';
 import {
   exportBatchHistoryCSV,
   buildBatchHistoryJSON,
-  exportBatchHistoryJSON
+  exportBatchHistoryJSON,
+  buildBatchTicketSummary
 } from '../csvExport';
 import { BatchRecord } from '../../types/hardware';
 
@@ -52,5 +53,16 @@ describe('report exports', () => {
     expect(anchor.getAttribute('download')).toMatch(
       /^hardware-diagnostic-report-\d+\.csv$/
     );
+  });
+
+  it('formats a plain-text ticket summary with metadata and PASS/FAIL counts', () => {
+    const summary = buildBatchTicketSummary(SAMPLE_RECORDS, {
+      technician: 'Alex',
+      assetTag: 'SN-555'
+    });
+    expect(summary).toContain('Asset / Serial: SN-555');
+    expect(summary).toContain('Technician: Alex');
+    expect(summary).toContain('Results: 1 PASS, 0 FAIL (1 total)');
+    expect(summary).toContain('[PASS] #1 Keyboard');
   });
 });
