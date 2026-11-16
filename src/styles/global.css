@@ -1444,3 +1444,17 @@ body {
   gap: 0.4rem;
   margin-top: 0.75rem;
 }
+
+.qa-checklist-actions {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.qa-quick-fail-form {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
