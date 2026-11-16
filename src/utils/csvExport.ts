@@ -75,3 +75,23 @@ export function exportBatchHistoryJSON(
   document.body.removeChild(link);
   URL.revokeObjectURL(url);
 }
+
+export function buildBatchTicketSummary(
+  records: BatchRecord[],
+  metadata?: BatchMetadata
+): string {
+  const passCount = records.filter((r) => r.status === 'PASS').length;
+  const failCount = records.filter((r) => r.status === 'FAIL').length;
+  const lines: string[] = [
+    '=== Hardware Diagnostic QA Summary ===',
+    `Date: ${new Date().toLocaleString()}`
+  ];
+  if (metadata?.assetTag) lines.push(`Asset / Serial: ${metadata.assetTag}`);
+  if (metadata?.technician) lines.push(`Technician: ${metadata.technician}`);
+  lines.push(`Results: ${passCount} PASS, ${failCount} FAIL (${records.length} total)`);
+  lines.push('');
+  records.forEach((r) => {
+    lines.push(`- [${r.status}] #${r.id} ${r.module}: ${r.details} (${r.timestamp})`);
+  });
+  return lines.join('\n');
+}
