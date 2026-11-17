@@ -37,6 +37,14 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
   const [failDetails, setFailDetails] = useState('');
   const [copiedSummary, setCopiedSummary] = useState(false);
 
+  const passCount = useMemo(
+    () => records.filter((r) => r.status === 'PASS').length,
+    [records]
+  );
+  const failCount = records.length - passCount;
+  const passRatePct =
+    records.length > 0 ? Math.round((passCount / records.length) * 100) : 0;
+
   const handleCopySummary = async () => {
     if (records.length === 0) return;
     const summary = buildBatchTicketSummary(records, metadata);
@@ -128,6 +136,27 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
               <Trash2 size={15} />
               <span>Clear Session Log</span>
             </button>
+          </div>
+        </div>
+
+        <div className="batch-kpi-strip">
+          <div className="batch-kpi-item">
+            <span className="batch-kpi-label">Total Units</span>
+            <strong className="batch-kpi-val">{records.length}</strong>
+          </div>
+          <div className="batch-kpi-item">
+            <span className="batch-kpi-label">PASS</span>
+            <strong className="batch-kpi-val text-green">{passCount}</strong>
+          </div>
+          <div className="batch-kpi-item">
+            <span className="batch-kpi-label">FAIL</span>
+            <strong className="batch-kpi-val" style={{ color: '#ef4444' }}>
+              {failCount}
+            </strong>
+          </div>
+          <div className="batch-kpi-item">
+            <span className="batch-kpi-label">Pass Rate</span>
+            <strong className="batch-kpi-val">{passRatePct}%</strong>
           </div>
         </div>
 
