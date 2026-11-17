@@ -1458,3 +1458,32 @@ body {
   flex-wrap: wrap;
   gap: 0.4rem;
 }
+
+/* Batch Yield KPI Strip */
+.batch-kpi-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.batch-kpi-item {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 0.65rem 0.9rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.batch-kpi-label {
+  font-size: 0.76rem;
+  color: var(--text-secondary);
+  font-weight: 600;
+}
+
+.batch-kpi-val {
+  font-family: var(--font-mono);
+  font-size: 0.95rem;
+}
