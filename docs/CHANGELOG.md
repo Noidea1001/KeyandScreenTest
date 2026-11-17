@@ -2,6 +2,15 @@
 
 All notable changes to the **Hardware Diagnostic Suite** project are documented in this file.
 
+## [v2.4.0] - 2026-11-17
+### Added
+- **Batch Yield KPI Strip**: Added Total Units, PASS count, FAIL count, and Pass Rate % summary cards in `BatchHistoryTable`, plus search, PASS/FAIL filtering, defect logging, and 1-click **Copy Ticket Summary**.
+- **Guided QA Checklist & Quick Defect Reporting**: Added `QAChecklistBar` with 7-module progress, 1-click **Next Untested** navigation, and inline **Report FAIL** for any active module.
+- **Lazy-Loaded Diagnostic Modules**: Code-split secondary diagnostic tabs in `App.tsx` using `React.lazy` and `Suspense` to reduce initial bundle size.
+- **Keyboard Enhancements**: Added `ANSI (104)` / `ISO (105 EU)` switcher, `PC / WIN` vs `macOS / CMD` keycap legends, press-to-release hold duration, active chord readout, **Clear Chatter**, and **Copy Key Log**.
+- **Hardware & Media Additions**: Added Mouse 1-inch DPI estimator, Display `1x/2x/4x` motion speed + SMPTE color bars + 30 Hz RGB stuck-pixel exerciser, Gamepad dual-motor rumble + 2D stick drift plots, Audio discrete frequency rattle tester + mic/camera device switcher + webcam snapshot, and System CPU quick benchmark + storage quota + network/bus probe.
+- **Expanded Test Coverage**: Added component tests for `MouseTester`, `ScreenTester`, `GamepadTester`, and `QAChecklistBar`.
+
 ## [v2.3.0] - 2026-11-13
 ### Added
 - **Touchscreen & Stylus Tester**: Added `TouchTester` with a 24-cell (`6×4`) dead-zone swipe/tap grid, active/max simultaneous multi-touch tracking, stylus pressure & tilt telemetry, and auto-PASS.
