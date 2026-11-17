@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef, Suspense, lazy } from 'react';
 import {
   ModuleTab,
   BatchMetadata,
@@ -12,13 +12,34 @@ import { Navigation } from './components/Navigation';
 import { QAChecklistBar } from './components/QAChecklistBar';
 import { PassBanner } from './components/PassBanner';
 import { KeyboardTester } from './components/KeyboardTester';
-import { MouseTester } from './components/MouseTester';
-import { ScreenTester } from './components/ScreenTester';
-import { AudioMediaTester } from './components/AudioMediaTester';
-import { GamepadTester } from './components/GamepadTester';
-import { TouchTester } from './components/TouchTester';
-import { SystemInfoTester } from './components/SystemInfoTester';
-import { BatchHistoryTable } from './components/BatchHistoryTable';
+
+const MouseTester = lazy(() =>
+  import('./components/MouseTester').then((m) => ({ default: m.MouseTester }))
+);
+const ScreenTester = lazy(() =>
+  import('./components/ScreenTester').then((m) => ({ default: m.ScreenTester }))
+);
+const AudioMediaTester = lazy(() =>
+  import('./components/AudioMediaTester').then((m) => ({
+    default: m.AudioMediaTester
+  }))
+);
+const GamepadTester = lazy(() =>
+  import('./components/GamepadTester').then((m) => ({ default: m.GamepadTester }))
+);
+const TouchTester = lazy(() =>
+  import('./components/TouchTester').then((m) => ({ default: m.TouchTester }))
+);
+const SystemInfoTester = lazy(() =>
+  import('./components/SystemInfoTester').then((m) => ({
+    default: m.SystemInfoTester
+  }))
+);
+const BatchHistoryTable = lazy(() =>
+  import('./components/BatchHistoryTable').then((m) => ({
+    default: m.BatchHistoryTable
+  }))
+);
 
 const VALID_TABS: ModuleTab[] = [
   'keyboard',
@@ -260,76 +281,84 @@ export const App: React.FC = () => {
           onResetNow={triggerInstantReset}
         />
 
-        {activeTab === 'keyboard' && (
-          <KeyboardTester
-            isActive={activeTab === 'keyboard'}
-            resetSignal={resetSignal}
-            onActivity={handleUserActivity}
-            onPass={handleModulePass}
-          />
-        )}
+        <Suspense
+          fallback={
+            <div className="card" style={{ textAlign: 'center', padding: '2rem' }}>
+              Loading diagnostic module...
+            </div>
+          }
+        >
+          {activeTab === 'keyboard' && (
+            <KeyboardTester
+              isActive={activeTab === 'keyboard'}
+              resetSignal={resetSignal}
+              onActivity={handleUserActivity}
+              onPass={handleModulePass}
+            />
+          )}
 
-        {activeTab === 'mouse' && (
-          <MouseTester
-            isActive={activeTab === 'mouse'}
-            resetSignal={resetSignal}
-            onActivity={handleUserActivity}
-            onPass={handleModulePass}
-          />
-        )}
+          {activeTab === 'mouse' && (
+            <MouseTester
+              isActive={activeTab === 'mouse'}
+              resetSignal={resetSignal}
+              onActivity={handleUserActivity}
+              onPass={handleModulePass}
+            />
+          )}
 
-        {activeTab === 'screen' && (
-          <ScreenTester
-            isActive={activeTab === 'screen'}
-            resetSignal={resetSignal}
-            onActivity={handleUserActivity}
-            onPass={handleModulePass}
-          />
-        )}
+          {activeTab === 'screen' && (
+            <ScreenTester
+              isActive={activeTab === 'screen'}
+              resetSignal={resetSignal}
+              onActivity={handleUserActivity}
+              onPass={handleModulePass}
+            />
+          )}
 
-        {activeTab === 'media' && (
-          <AudioMediaTester
-            resetSignal={resetSignal}
-            onActivity={handleUserActivity}
-            onPass={handleModulePass}
-          />
-        )}
+          {activeTab === 'media' && (
+            <AudioMediaTester
+              resetSignal={resetSignal}
+              onActivity={handleUserActivity}
+              onPass={handleModulePass}
+            />
+          )}
 
-        {activeTab === 'gamepad' && (
-          <GamepadTester
-            isActive={activeTab === 'gamepad'}
-            onPass={handleModulePass}
-          />
-        )}
+          {activeTab === 'gamepad' && (
+            <GamepadTester
+              isActive={activeTab === 'gamepad'}
+              onPass={handleModulePass}
+            />
+          )}
 
-        {activeTab === 'touch' && (
-          <TouchTester
-            resetSignal={resetSignal}
-            onActivity={handleUserActivity}
-            onPass={handleModulePass}
-          />
-        )}
+          {activeTab === 'touch' && (
+            <TouchTester
+              resetSignal={resetSignal}
+              onActivity={handleUserActivity}
+              onPass={handleModulePass}
+            />
+          )}
 
-        {activeTab === 'system' && (
-          <SystemInfoTester
-            onActivity={handleUserActivity}
-            onPass={handleModulePass}
-          />
-        )}
+          {activeTab === 'system' && (
+            <SystemInfoTester
+              onActivity={handleUserActivity}
+              onPass={handleModulePass}
+            />
+          )}
 
-        {activeTab === 'history' && (
-          <BatchHistoryTable
-            records={batchHistory}
-            metadata={batchMetadata}
-            onMetadataChange={setBatchMetadata}
-            onLogFail={handleLogFail}
-            onClearHistory={() => {
-              setBatchHistory([]);
-              setPassedModules(new Set());
-              localStorage.removeItem('hw_batch_history');
-            }}
-          />
-        )}
+          {activeTab === 'history' && (
+            <BatchHistoryTable
+              records={batchHistory}
+              metadata={batchMetadata}
+              onMetadataChange={setBatchMetadata}
+              onLogFail={handleLogFail}
+              onClearHistory={() => {
+                setBatchHistory([]);
+                setPassedModules(new Set());
+                localStorage.removeItem('hw_batch_history');
+              }}
+            />
+          )}
+        </Suspense>
       </main>
     </>
   );
