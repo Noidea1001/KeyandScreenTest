@@ -78,6 +78,7 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
   });
   const [lastHoldMs, setLastHoldMs] = useState<number | null>(null);
   const [history, setHistory] = useState<HistoryEntry[]>([]);
+  const [copiedLog, setCopiedLog] = useState<boolean>(false);
 
   const lastPressTimeRef = React.useRef<Record<string, number>>({});
   const keyDownTimeRef = React.useRef<Record<string, number>>({});
@@ -109,6 +110,25 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
   useEffect(() => {
     resetKeyboardState();
   }, [resetSignal, resetKeyboardState]);
+
+  const clearChatterOnly = () => {
+    setChatterCodes(new Set());
+    setChatterDetail('No switch bounce detected');
+  };
+
+  const copyKeyLog = async () => {
+    if (history.length === 0) return;
+    const text = history
+      .map((h) => `${h.code}${h.isChatter ? ' [CHATTER]' : ''}`)
+      .join(', ');
+    try {
+      await navigator.clipboard?.writeText(text);
+      setCopiedLog(true);
+      setTimeout(() => setCopiedLog(false), 2000);
+    } catch {
+      // clipboard unavailable
+    }
+  };
 
   const handleLayoutChange = (nextLayout: KeyboardLayoutType) => {
     setLayout(nextLayout);
@@ -648,6 +668,21 @@ export const KeyboardTester: React.FC<KeyboardTesterProps> = ({
             </span>
           ))
         )}
+        <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.4rem' }}>
+          {chatterCodes.size > 0 && (
+            <button className="btn btn-chip chip-on" onClick={clearChatterOnly}>
+              Clear Chatter
+            </button>
+          )}
+          {history.length > 0 && (
+            <button
+              className="btn btn-chip chip-on"
+              onClick={() => void copyKeyLog()}
+            >
+              {copiedLog ? 'Copied!' : 'Copy Key Log'}
+            </button>
+          )}
+        </div>
       </div>
     </section>
   );
