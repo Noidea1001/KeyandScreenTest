@@ -56,7 +56,15 @@ When a device completes 100% of its required diagnostic checks without hardware 
 - **Webcam Sensor Inspector**: Opens the video capture stream and reads native `videoWidth` and `videoHeight` hardware dimensions.
 
 ### 2.5. Controller & Axis Diagnostic (`GamepadTester.tsx`)
-- Polls `navigator.getGamepads()` on every animation frame to display digital button actuation percentages and analog stick X/Y axis coordinates to 3 decimal places for center-drift detection.
+- Polls `navigator.getGamepads()` on every animation frame to display digital button actuation percentages, live 2D circular Left/Right analog stick drift plots, and dual-motor vibration/rumble testing.
+
+### 2.6. Touchscreen & Stylus (`TouchTester.tsx`) & System Telemetry (`SystemInfoTester.tsx`)
+- **Touch & Stylus**: 24-cell (`6×4`) dead-zone swipe/tap grid, active/max simultaneous multi-touch tracking, and stylus pressure/tilt telemetry.
+- **System & Battery**: CPU logical cores, device memory, WebGL GPU renderer, display DPR/P3 gamut, Battery Status API, 400 ms CPU quick stress benchmark, storage quota, and WebUSB/WebHID/Web Bluetooth bus checks.
+
+### 2.7. Guided QA Checklist & Batch Log (`QAChecklistBar.tsx`, `BatchHistoryTable.tsx`)
+- 7-module QA progress bar with 1-click **Next Untested** jump and inline **Report FAIL** defect logging.
+- Persistent `localStorage` batch log with **Yield KPIs** (Total / PASS / FAIL / Pass Rate %), search & status filtering, Technician & Asset Tag metadata, **CSV / JSON** export, **Copy Ticket Summary**, and **Print / PDF QA Certificate**.
 
 ### 2.6. Batch Audit Log & CSV Export (`BatchHistoryTable.tsx`)
 - Records every verified unit with a sequential ID, module name, diagnostic telemetry summary, `PASS` badge, and timestamp, with one-click export to UTF-8 CSV.
