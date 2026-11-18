@@ -40,13 +40,15 @@ export const Navigation: React.FC<NavigationProps> = ({
   ];
 
   return (
-    <nav className="nav-tabs">
+    <nav className="nav-tabs" role="tablist" aria-label="Diagnostic Modules">
       {navItems.map((item) => {
         const isPassed = passedModules.has(item.id);
         const isActive = activeTab === item.id;
         return (
           <button
             key={item.id}
+            role="tab"
+            aria-selected={isActive}
             className={`tab-btn ${isActive ? 'active' : ''} ${isPassed ? 'passed' : ''}`}
             onClick={() => onSelectTab(item.id)}
           >
