@@ -246,7 +246,8 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
           </form>
         )}
 
-        <table className="batch-table">
+        <div className="table-scroll-wrapper">
+          <table className="batch-table">
           <thead>
             <tr>
               <th>Unit #</th>
@@ -288,8 +289,9 @@ export const BatchHistoryTable: React.FC<BatchHistoryTableProps> = ({
                 </tr>
               ))
             )}
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
       </div>
     </section>
   );
