@@ -34,8 +34,45 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
 
   const micCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const micLoopbackGainRef = useRef<GainNode | null>(null);
+  const micStreamRef = useRef<MediaStream | null>(null);
+  const micAudioCtxRef = useRef<AudioContext | null>(null);
+  const micAnimIdRef = useRef<number>(0);
+  const camStreamRef = useRef<MediaStream | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const hasTriggeredPassRef = useRef<boolean>(false);
+
+  const stopMicResources = useCallback(() => {
+    if (micAnimIdRef.current) {
+      cancelAnimationFrame(micAnimIdRef.current);
+      micAnimIdRef.current = 0;
+    }
+    if (micStreamRef.current) {
+      micStreamRef.current.getTracks().forEach((t) => t.stop());
+      micStreamRef.current = null;
+    }
+    if (micAudioCtxRef.current) {
+      void micAudioCtxRef.current.close().catch(() => {});
+      micAudioCtxRef.current = null;
+    }
+    micLoopbackGainRef.current = null;
+  }, []);
+
+  const stopCamResources = useCallback(() => {
+    if (camStreamRef.current) {
+      camStreamRef.current.getTracks().forEach((t) => t.stop());
+      camStreamRef.current = null;
+    }
+    if (videoRef.current) {
+      videoRef.current.srcObject = null;
+    }
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      stopMicResources();
+      stopCamResources();
+    };
+  }, [stopMicResources, stopCamResources]);
 
   const refreshDeviceList = useCallback(async () => {
     if (!navigator.mediaDevices?.enumerateDevices) return;
@@ -53,10 +90,15 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
   }, [refreshDeviceList]);
 
   const resetMediaState = useCallback(() => {
+    stopMicResources();
+    stopCamResources();
     setVerifiedParts(new Set());
+    setMicVolume(0);
+    setMicStatus('Idle — Click Start to test microphone');
+    setCameraStatus('Idle — Click Start to test camera');
     setSnapshotUrl(null);
     hasTriggeredPassRef.current = false;
-  }, []);
+  }, [stopMicResources, stopCamResources]);
 
   useEffect(() => {
     resetMediaState();
@@ -80,16 +122,19 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
 
   const startMicrophoneTest = async () => {
     onActivity();
+    stopMicResources();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         audio: selectedMicId ? { deviceId: { exact: selectedMicId } } : true
       });
+      micStreamRef.current = stream;
       void refreshDeviceList();
       setMicStatus('Active — Capturing real-time audio spectrum');
       const AudioCtx =
         window.AudioContext ||
         (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
       const audioCtx = new AudioCtx();
+      micAudioCtxRef.current = audioCtx;
       const source = audioCtx.createMediaStreamSource(stream);
       const analyser = audioCtx.createAnalyser();
       analyser.fftSize = 256;
@@ -126,7 +171,7 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
 
         const pct = Math.min(100, Math.round((sum / buffer.length / 128) * 100));
         setMicVolume(pct);
-        requestAnimationFrame(drawLoop);
+        micAnimIdRef.current = requestAnimationFrame(drawLoop);
       };
       drawLoop();
     } catch {
@@ -145,10 +190,12 @@ export const AudioMediaTester: React.FC<AudioMediaTesterProps> = ({
 
   const startCameraTest = async () => {
     onActivity();
+    stopCamResources();
     try {
       const stream = await navigator.mediaDevices.getUserMedia({
         video: selectedCamId ? { deviceId: { exact: selectedCamId } } : true
       });
+      camStreamRef.current = stream;
       void refreshDeviceList();
       if (videoRef.current) {
         videoRef.current.srcObject = stream;
