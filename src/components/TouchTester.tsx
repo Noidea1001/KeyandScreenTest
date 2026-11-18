@@ -105,7 +105,7 @@ export const TouchTester: React.FC<TouchTesterProps> = ({
 
   return (
     <section className="module-panel active">
-      <div className="diagnostic-stats-row">
+      <div className="stats-bar">
         <div className="stat-card">
           <div className="stat-label">
             <Fingerprint size={14} />
