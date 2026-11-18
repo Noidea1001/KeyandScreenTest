@@ -99,6 +99,18 @@ function getInitialBatchMetadata(): BatchMetadata {
   }
 }
 
+function getInitialPassedModules(): Set<ModuleTab> {
+  try {
+    const raw = localStorage.getItem('hw_passed_modules');
+    if (!raw) return new Set();
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return new Set();
+    return new Set(parsed.filter((t): t is ModuleTab => VALID_TABS.includes(t)));
+  } catch {
+    return new Set();
+  }
+}
+
 export const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<ModuleTab>(getInitialTab);
   const [theme, setTheme] = useState<ThemeMode>(getInitialTheme);
@@ -107,11 +119,20 @@ export const App: React.FC = () => {
   const [soundEnabled, setSoundEnabled] = useState<boolean>(true);
   const [resetSignal, setResetSignal] = useState<number>(0);
   const [passNotification, setPassNotification] = useState<PassNotification | null>(null);
-  const [passedModules, setPassedModules] = useState<Set<ModuleTab>>(new Set());
+  const [passedModules, setPassedModules] = useState<Set<ModuleTab>>(
+    getInitialPassedModules
+  );
   const [batchHistory, setBatchHistory] = useState<BatchRecord[]>(getInitialBatchHistory);
   const [batchMetadata, setBatchMetadata] = useState<BatchMetadata>(getInitialBatchMetadata);
 
   const escTimesRef = useRef<number[]>([]);
+
+  useEffect(() => {
+    localStorage.setItem(
+      'hw_passed_modules',
+      JSON.stringify(Array.from(passedModules))
+    );
+  }, [passedModules]);
 
   useEffect(() => {
     localStorage.setItem('hw_batch_history', JSON.stringify(batchHistory));
@@ -355,6 +376,7 @@ export const App: React.FC = () => {
                 setBatchHistory([]);
                 setPassedModules(new Set());
                 localStorage.removeItem('hw_batch_history');
+                localStorage.removeItem('hw_passed_modules');
               }}
             />
           )}
